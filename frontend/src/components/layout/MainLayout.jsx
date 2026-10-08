@@ -20,6 +20,7 @@ const MainLayout = () => {
     { name: 'Classes', path: '/classes', icon: GraduationCap, roles: ['ADMIN'] },
     { name: 'Students', path: '/students', icon: Users, roles: ['ADMIN'] },
     { name: 'Attendance', path: '/attendance', icon: ClipboardList, roles: ['ADMIN', 'TEACHER'] },
+    { name: 'Reports', path: '/reports', icon: ClipboardList, roles: ['ADMIN', 'TEACHER'] },
   ];
 
   const allowedNavItems = navItems.filter(item => item.roles.includes(user?.role));

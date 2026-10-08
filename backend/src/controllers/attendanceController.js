@@ -3,6 +3,8 @@ import Teacher from '../models/Teacher.js';
 import Student from '../models/Student.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
 
+// ... existing code ...
+
 // @desc    Mark attendance for a class
 // @route   POST /api/attendance
 // @access  Private (Teacher/Admin)
@@ -112,9 +114,6 @@ export const updateClassAttendance = async (req, res) => {
       }
     }
 
-    // Process updates
-    // For each record, find the existing attendance and update the status
-    // Using Promise.all for parallel updates
     await Promise.all(records.map(async (record) => {
       await Attendance.findOneAndUpdate(
         { class: classId, attendanceDate, student: record.studentId },
@@ -123,6 +122,40 @@ export const updateClassAttendance = async (req, res) => {
     }));
 
     return successResponse(res, 200, 'Attendance updated successfully');
+  } catch (error) {
+    console.error(error);
+    return errorResponse(res, 500, 'Server Error');
+  }
+};
+
+// @desc    Get attendance report by date range
+// @route   GET /api/attendance/report
+// @access  Private (Teacher/Admin)
+export const getAttendanceReport = async (req, res) => {
+  try {
+    const { classId, startDate, endDate } = req.query;
+
+    if (!classId || !startDate || !endDate) {
+      return errorResponse(res, 400, 'Please provide classId, startDate, and endDate');
+    }
+
+    // Authorization
+    if (req.user.role === 'TEACHER') {
+      const teacher = await Teacher.findOne({ user: req.user._id });
+      if (!teacher || !teacher.assignedClasses.includes(classId)) {
+        return errorResponse(res, 403, 'You are not authorized to view reports for this class');
+      }
+    }
+
+    const records = await Attendance.find({
+      class: classId,
+      attendanceDate: {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      }
+    }).populate('student', 'name rollNumber').sort({ attendanceDate: -1 });
+
+    return successResponse(res, 200, 'Report retrieved successfully', { records });
   } catch (error) {
     console.error(error);
     return errorResponse(res, 500, 'Server Error');
