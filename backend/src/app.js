@@ -3,6 +3,9 @@ import cors from 'cors';
 import morgan from 'morgan';
 
 import authRoutes from './routes/authRoutes.js';
+import teacherRoutes from './routes/teacherRoutes.js';
+import studentRoutes from './routes/studentRoutes.js';
+import classRoutes from './routes/classRoutes.js';
 
 const app = express();
 
@@ -19,6 +22,9 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/teachers', teacherRoutes);
+app.use('/api/students', studentRoutes);
+app.use('/api/classes', classRoutes);
 
 // We will add more routes and error handling middleware later
 
