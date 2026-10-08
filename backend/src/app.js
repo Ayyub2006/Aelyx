@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 
+import authRoutes from './routes/authRoutes.js';
+
 const app = express();
 
 // Middleware
@@ -15,6 +17,9 @@ app.get('/', (req, res) => {
   res.status(200).json({ success: true, message: 'Mini School ERP API is running' });
 });
 
-// We will add routes and error handling middleware later
+// Routes
+app.use('/api/auth', authRoutes);
+
+// We will add more routes and error handling middleware later
 
 export default app;
