@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Teachers from './pages/Teachers';
 import Classes from './pages/Classes';
 import Students from './pages/Students';
+import AttendanceMarking from './pages/AttendanceMarking';
 
 // Placeholder for Dashboard
 const Dashboard = () => <div><h1 className="text-2xl font-bold">Dashboard</h1><p>Welcome to Mini ERP</p></div>;
@@ -31,7 +32,7 @@ const App = () => {
               </Route>
               
               <Route element={<RoleRoute roles={['ADMIN', 'TEACHER']} />}>
-                <Route path="/attendance" element={<Placeholder title="Attendance" />} />
+                <Route path="/attendance" element={<AttendanceMarking />} />
               </Route>
             </Route>
           </Route>
