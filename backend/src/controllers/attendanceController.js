@@ -15,26 +15,21 @@ export const markAttendance = async (req, res) => {
     }
 
     const attendanceDate = new Date(date);
-    attendanceDate.setHours(0, 0, 0, 0); // Normalize date
+    attendanceDate.setHours(0, 0, 0, 0);
 
-    // Authorization: If user is a TEACHER, verify they are assigned to this class
+    // Authorization
     if (req.user.role === 'TEACHER') {
       const teacher = await Teacher.findOne({ user: req.user._id });
-      if (!teacher) {
-        return errorResponse(res, 403, 'Teacher profile not found');
-      }
-      if (!teacher.assignedClasses.includes(classId)) {
+      if (!teacher || !teacher.assignedClasses.includes(classId)) {
         return errorResponse(res, 403, 'You are not authorized to mark attendance for this class');
       }
     }
 
-    // Check if attendance already exists for this class and date to prevent duplicates
     const existingAttendance = await Attendance.findOne({ class: classId, attendanceDate });
     if (existingAttendance) {
       return errorResponse(res, 400, 'Attendance already marked for this class on this date. Please use the Edit feature.');
     }
 
-    // Verify all students belong to the class
     const studentIds = records.map(r => r.studentId);
     const validStudentsCount = await Student.countDocuments({ _id: { $in: studentIds }, class: classId });
     
@@ -42,7 +37,6 @@ export const markAttendance = async (req, res) => {
       return errorResponse(res, 400, 'Some students do not belong to the selected class');
     }
 
-    // Prepare documents for insertion
     const attendanceDocs = records.map(record => ({
       student: record.studentId,
       class: classId,
@@ -55,10 +49,82 @@ export const markAttendance = async (req, res) => {
     return successResponse(res, 201, 'Attendance saved successfully');
   } catch (error) {
     console.error(error);
-    // Handle MongoDB duplicate key error explicitly just in case
     if (error.code === 11000) {
-      return errorResponse(res, 400, 'Duplicate attendance detected. Attendance already marked for one or more students.');
+      return errorResponse(res, 400, 'Duplicate attendance detected.');
     }
+    return errorResponse(res, 500, 'Server Error');
+  }
+};
+
+// @desc    Get attendance for a class on a specific date
+// @route   GET /api/attendance/class/:classId
+// @access  Private (Teacher/Admin)
+export const getClassAttendanceByDate = async (req, res) => {
+  try {
+    const { classId } = req.params;
+    const { date } = req.query;
+
+    if (!date) {
+      return errorResponse(res, 400, 'Please provide a date');
+    }
+
+    const attendanceDate = new Date(date);
+    attendanceDate.setHours(0, 0, 0, 0);
+
+    // Authorization
+    if (req.user.role === 'TEACHER') {
+      const teacher = await Teacher.findOne({ user: req.user._id });
+      if (!teacher || !teacher.assignedClasses.includes(classId)) {
+        return errorResponse(res, 403, 'You are not authorized to view attendance for this class');
+      }
+    }
+
+    const attendanceRecords = await Attendance.find({ class: classId, attendanceDate })
+      .populate('student', 'name rollNumber');
+
+    return successResponse(res, 200, 'Attendance retrieved successfully', { attendance: attendanceRecords });
+  } catch (error) {
+    console.error(error);
+    return errorResponse(res, 500, 'Server Error');
+  }
+};
+
+// @desc    Edit existing attendance for a class
+// @route   PUT /api/attendance/class/:classId
+// @access  Private (Teacher/Admin)
+export const updateClassAttendance = async (req, res) => {
+  try {
+    const { classId } = req.params;
+    const { date, records } = req.body;
+
+    if (!date || !records || !Array.isArray(records)) {
+      return errorResponse(res, 400, 'Please provide date and attendance records');
+    }
+
+    const attendanceDate = new Date(date);
+    attendanceDate.setHours(0, 0, 0, 0);
+
+    // Authorization
+    if (req.user.role === 'TEACHER') {
+      const teacher = await Teacher.findOne({ user: req.user._id });
+      if (!teacher || !teacher.assignedClasses.includes(classId)) {
+        return errorResponse(res, 403, 'You are not authorized to edit attendance for this class');
+      }
+    }
+
+    // Process updates
+    // For each record, find the existing attendance and update the status
+    // Using Promise.all for parallel updates
+    await Promise.all(records.map(async (record) => {
+      await Attendance.findOneAndUpdate(
+        { class: classId, attendanceDate, student: record.studentId },
+        { status: record.status }
+      );
+    }));
+
+    return successResponse(res, 200, 'Attendance updated successfully');
+  } catch (error) {
+    console.error(error);
     return errorResponse(res, 500, 'Server Error');
   }
 };

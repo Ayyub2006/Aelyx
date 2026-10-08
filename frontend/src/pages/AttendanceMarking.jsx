@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getClasses } from '../services/classApi';
 import { getStudents } from '../services/studentApi';
-import { markAttendance } from '../services/attendanceApi';
+import { markAttendance, getClassAttendanceByDate, updateClassAttendance } from '../services/attendanceApi';
 import { useAuth } from '../context/AuthContext';
-import { Check, X, Save } from 'lucide-react';
+import { Check, X, Save, Edit3 } from 'lucide-react';
 import clsx from 'clsx';
 
 const AttendanceMarking = () => {
@@ -14,24 +14,25 @@ const AttendanceMarking = () => {
   const [students, setStudents] = useState([]);
   const [attendance, setAttendance] = useState({}); // { studentId: 'PRESENT' | 'ABSENT' }
   const [loading, setLoading] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
     fetchClasses();
   }, []);
 
   useEffect(() => {
-    if (selectedClass) {
-      fetchStudents(selectedClass);
+    if (selectedClass && date) {
+      loadData(selectedClass, date);
     } else {
       setStudents([]);
       setAttendance({});
+      setIsEditMode(false);
     }
-  }, [selectedClass]);
+  }, [selectedClass, date]);
 
   const fetchClasses = async () => {
     try {
       const res = await getClasses();
-      // If TEACHER, filter classes they are assigned to
       if (user.role === 'TEACHER') {
         const assigned = res.data.classes.filter(c => c.teacher && c.teacher.user._id === user.id);
         setClasses(assigned);
@@ -43,19 +44,45 @@ const AttendanceMarking = () => {
     }
   };
 
-  const fetchStudents = async (classId) => {
+  const loadData = async (classId, selectedDate) => {
     setLoading(true);
     try {
-      const res = await getStudents(classId);
-      setStudents(res.data.students);
-      // Initialize all as PRESENT by default
-      const initialAttendance = {};
-      res.data.students.forEach(s => {
-        initialAttendance[s._id] = 'PRESENT';
-      });
-      setAttendance(initialAttendance);
+      // 1. Fetch all students for the class
+      const studentRes = await getStudents(classId);
+      const classStudents = studentRes.data.students;
+      setStudents(classStudents);
+
+      // 2. Check if attendance already exists for this date
+      const attendanceRes = await getClassAttendanceByDate(classId, selectedDate);
+      const existingRecords = attendanceRes.data.attendance;
+
+      if (existingRecords.length > 0) {
+        // Edit Mode
+        setIsEditMode(true);
+        const loadedAttendance = {};
+        existingRecords.forEach(record => {
+          loadedAttendance[record.student._id] = record.status;
+        });
+        
+        // Handle students who were added to the class after attendance was marked
+        classStudents.forEach(s => {
+          if (!loadedAttendance[s._id]) {
+             loadedAttendance[s._id] = 'PRESENT';
+          }
+        });
+
+        setAttendance(loadedAttendance);
+      } else {
+        // Mark Mode
+        setIsEditMode(false);
+        const initialAttendance = {};
+        classStudents.forEach(s => {
+          initialAttendance[s._id] = 'PRESENT';
+        });
+        setAttendance(initialAttendance);
+      }
     } catch (error) {
-      console.error("Failed to fetch students");
+      console.error("Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -82,9 +109,14 @@ const AttendanceMarking = () => {
     }));
 
     try {
-      await markAttendance({ classId: selectedClass, date, records });
-      alert('Attendance saved successfully');
-      // Reset or redirect
+      if (isEditMode) {
+        await updateClassAttendance(selectedClass, { date, records });
+        alert('Attendance updated successfully');
+      } else {
+        await markAttendance({ classId: selectedClass, date, records });
+        alert('Attendance saved successfully');
+        setIsEditMode(true); // Automatically switch to edit mode after saving
+      }
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to save attendance');
     }
@@ -95,9 +127,15 @@ const AttendanceMarking = () => {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900">Mark Attendance</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-900">Attendance Dashboard</h1>
+        {isEditMode && (
+          <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium flex items-center">
+            <Edit3 size={16} className="mr-1" /> Edit Mode Active
+          </span>
+        )}
+      </div>
 
-      {/* Top Controls */}
       <div className="bg-white p-6 rounded-lg shadow flex flex-col md:flex-row gap-6 items-end">
         <div className="flex-1 w-full">
           <label className="block text-sm font-medium text-gray-700 mb-1">Select Class</label>
@@ -118,7 +156,7 @@ const AttendanceMarking = () => {
           <input 
             type="date" 
             value={date}
-            max={new Date().toISOString().split('T')[0]} // Max today
+            max={new Date().toISOString().split('T')[0]} 
             onChange={(e) => setDate(e.target.value)}
             className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2 border" 
           />
@@ -154,7 +192,7 @@ const AttendanceMarking = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
-                  <tr><td colSpan="3" className="px-6 py-10 text-center text-gray-500">Loading students...</td></tr>
+                  <tr><td colSpan="3" className="px-6 py-10 text-center text-gray-500">Loading records...</td></tr>
                 ) : students.length === 0 ? (
                   <tr><td colSpan="3" className="px-6 py-10 text-center text-gray-500">No students found in this class.</td></tr>
                 ) : (
@@ -204,10 +242,14 @@ const AttendanceMarking = () => {
           <div className="p-4 border-t bg-gray-50 flex justify-end">
             <button
               onClick={handleSubmit}
-              disabled={students.length === 0}
-              className="flex items-center px-6 py-2.5 bg-primary text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 transition-colors shadow-sm"
+              disabled={students.length === 0 || loading}
+              className={clsx(
+                "flex items-center px-6 py-2.5 text-white rounded-md transition-colors shadow-sm disabled:opacity-50",
+                isEditMode ? "bg-amber-600 hover:bg-amber-700" : "bg-primary hover:bg-indigo-700"
+              )}
             >
-              <Save size={18} className="mr-2" /> Save Attendance
+              <Save size={18} className="mr-2" /> 
+              {isEditMode ? 'Update Attendance' : 'Save Attendance'}
             </button>
           </div>
         </div>
