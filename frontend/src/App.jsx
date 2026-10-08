@@ -9,11 +9,7 @@ import Classes from './pages/Classes';
 import Students from './pages/Students';
 import AttendanceMarking from './pages/AttendanceMarking';
 import AttendanceReport from './pages/AttendanceReport';
-
-// Placeholder for Dashboard
-const Dashboard = () => <div><h1 className="text-2xl font-bold">Dashboard</h1><p>Welcome to Mini ERP</p></div>;
-// Placeholder for other pages
-const Placeholder = ({ title }) => <div><h1 className="text-2xl font-bold">{title}</h1></div>;
+import Dashboard from './pages/Dashboard';
 
 const App = () => {
   return (
