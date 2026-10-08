@@ -10,6 +10,7 @@ import Students from './pages/Students';
 import AttendanceMarking from './pages/AttendanceMarking';
 import AttendanceReport from './pages/AttendanceReport';
 import Dashboard from './pages/Dashboard';
+import NotFound from './pages/NotFound';
 
 const App = () => {
   return (
@@ -35,7 +36,7 @@ const App = () => {
             </Route>
           </Route>
           
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
     </Router>
