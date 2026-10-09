@@ -59,16 +59,8 @@ const AttendanceReport = () => {
     setLoading(true);
     try {
       const res = await getAttendanceReport(selectedClass, startDate, endDate, selectedStudent);
-      const fetchedRecords = res.data.records;
-      setRecords(fetchedRecords);
-
-      // Calculate Summary
-      const total = fetchedRecords.length;
-      const present = fetchedRecords.filter(r => r.status === 'PRESENT').length;
-      const absent = total - present;
-      const percentage = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
-
-      setSummary({ total, present, absent, percentage });
+      setRecords(res.data.records);
+      setSummary(res.data.summary);
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to generate report');
     } finally {

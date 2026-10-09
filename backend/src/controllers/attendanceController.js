@@ -169,7 +169,19 @@ export const getAttendanceReport = async (req, res) => {
 
     const records = await Attendance.find(filter).populate('student', 'name rollNumber').sort({ attendanceDate: -1 });
 
-    return successResponse(res, 200, 'Report retrieved successfully', { records });
+    const total = records.length;
+    const present = records.filter(r => r.status === 'PRESENT').length;
+    const absent = total - present;
+    const percentage = total > 0 ? Number(((present / total) * 100).toFixed(1)) : 0;
+
+    const summary = {
+      total,
+      present,
+      absent,
+      percentage
+    };
+
+    return successResponse(res, 200, 'Report retrieved successfully', { records, summary });
   } catch (error) {
     console.error(error);
     return errorResponse(res, 500, 'Server Error');
