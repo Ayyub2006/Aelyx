@@ -206,7 +206,8 @@ const AttendanceMarking = () => {
             )}
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-white">
                 <tr>
@@ -268,6 +269,61 @@ const AttendanceMarking = () => {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden flex flex-col space-y-3 p-4 bg-gray-50/50">
+            {loading ? (
+              <div className="py-10 text-center text-gray-500">Loading records...</div>
+            ) : students.length === 0 ? (
+              <div className="py-10 text-center text-gray-500">No students found in this class.</div>
+            ) : (
+              students.map(student => (
+                <div 
+                  key={student._id} 
+                  className={clsx(
+                    "p-4 rounded-xl shadow-sm border transition-colors flex flex-col gap-3",
+                    attendance[student._id] === 'ABSENT' ? 'bg-red-50 border-red-100' : 'bg-white border-gray-200'
+                  )}
+                >
+                  <div className="flex justify-between items-center border-b border-gray-100 pb-2">
+                    <span className="font-bold text-gray-900 text-lg">{student.name}</span>
+                    <span className="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-md text-xs font-mono font-bold">Roll: {student.rollNumber}</span>
+                  </div>
+                  
+                  <div className="flex w-full mt-1">
+                    <button
+                      type="button"
+                      onClick={() => toggleStatus(student._id, 'PRESENT')}
+                      disabled={user?.role === 'ADMIN'}
+                      className={clsx(
+                        "flex-1 flex justify-center items-center py-2.5 rounded-l-lg border text-sm font-bold transition-colors",
+                        attendance[student._id] === 'PRESENT' 
+                          ? "bg-green-500 text-white border-green-500 z-10" 
+                          : "bg-white text-gray-700 border-gray-300",
+                        user?.role === 'ADMIN' ? "cursor-not-allowed opacity-80" : ""
+                      )}
+                    >
+                      <Check size={18} className="mr-1.5" /> Present
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => toggleStatus(student._id, 'ABSENT')}
+                      disabled={user?.role === 'ADMIN'}
+                      className={clsx(
+                        "flex-1 flex justify-center items-center py-2.5 rounded-r-lg border border-l-0 text-sm font-bold transition-colors",
+                        attendance[student._id] === 'ABSENT' 
+                          ? "bg-red-500 text-white border-red-500 z-10" 
+                          : "bg-white text-gray-700 border-gray-300",
+                        user?.role === 'ADMIN' ? "cursor-not-allowed opacity-80" : ""
+                      )}
+                    >
+                      <X size={18} className="mr-1.5" /> Absent
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
 
           {user?.role !== 'ADMIN' && (
