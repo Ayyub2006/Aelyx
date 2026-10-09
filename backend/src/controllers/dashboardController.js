@@ -33,11 +33,14 @@ export const getDashboardSummary = async (req, res) => {
       // Teacher sees stats specific to their classes
       const teacher = await Teacher.findOne({ user: req.user._id });
       if (teacher) {
-        summary.totalClasses = teacher.assignedClasses.length;
-        summary.totalStudents = await Student.countDocuments({ class: { $in: teacher.assignedClasses } });
+        const myClasses = await Class.find({ teacher: teacher._id }).select('_id');
+        const myClassIds = myClasses.map(c => c._id);
+        
+        summary.totalClasses = myClassIds.length;
+        summary.totalStudents = await Student.countDocuments({ class: { $in: myClassIds } });
 
         const todayAttendance = await Attendance.find({ 
-          class: { $in: teacher.assignedClasses },
+          class: { $in: myClassIds },
           attendanceDate: today 
         });
         summary.todayPresent = todayAttendance.filter(a => a.status === 'PRESENT').length;

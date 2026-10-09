@@ -54,10 +54,21 @@ export const getStudents = async (req, res) => {
 // @access  Private/Admin
 export const getStudentById = async (req, res) => {
   try {
-    const student = await Student.findById(req.params.id).populate('class', 'grade section');
+    const student = await Student.findById(req.params.id).populate('class', 'grade section teacher');
     if (!student) {
       return errorResponse(res, 404, 'Student not found');
     }
+
+    if (req.user.role === 'TEACHER') {
+      const teacher = await import('../models/Teacher.js').then(m => m.default.findOne({ user: req.user._id }));
+      if (!teacher) return errorResponse(res, 403, 'Teacher profile not found');
+      
+      const studentClass = await Class.findById(student.class._id);
+      if (!studentClass || studentClass.teacher?.toString() !== teacher._id.toString()) {
+        return errorResponse(res, 403, 'Not authorized to view this student');
+      }
+    }
+
     return successResponse(res, 200, 'Student retrieved successfully', { student });
   } catch (error) {
     console.error(error);
