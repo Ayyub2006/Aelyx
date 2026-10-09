@@ -15,7 +15,9 @@ export const updateClassAttendance = async (classId, updateData) => {
   return data;
 };
 
-export const getAttendanceReport = async (classId, startDate, endDate) => {
-  const { data } = await api.get(`/attendance/report?classId=${classId}&startDate=${startDate}&endDate=${endDate}`);
+export const getAttendanceReport = async (classId, startDate, endDate, studentId = '') => {
+  let url = `/attendance/report?classId=${classId}&startDate=${startDate}&endDate=${endDate}`;
+  if (studentId) url += `&studentId=${studentId}`;
+  const { data } = await api.get(url);
   return data;
 };

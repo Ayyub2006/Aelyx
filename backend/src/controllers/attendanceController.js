@@ -140,7 +140,7 @@ export const updateClassAttendance = async (req, res) => {
 // @access  Private (Teacher/Admin)
 export const getAttendanceReport = async (req, res) => {
   try {
-    const { classId, startDate, endDate } = req.query;
+    const { classId, startDate, endDate, studentId } = req.query;
 
     if (!classId || !startDate || !endDate) {
       return errorResponse(res, 400, 'Please provide classId, startDate, and endDate');
@@ -155,13 +155,19 @@ export const getAttendanceReport = async (req, res) => {
       }
     }
 
-    const records = await Attendance.find({
+    let filter = {
       class: classId,
       attendanceDate: {
         $gte: new Date(startDate),
         $lte: new Date(endDate)
       }
-    }).populate('student', 'name rollNumber').sort({ attendanceDate: -1 });
+    };
+
+    if (studentId) {
+      filter.student = studentId;
+    }
+
+    const records = await Attendance.find(filter).populate('student', 'name rollNumber').sort({ attendanceDate: -1 });
 
     return successResponse(res, 200, 'Report retrieved successfully', { records });
   } catch (error) {

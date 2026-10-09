@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { getClasses } from '../services/classApi';
+import { getStudents } from '../services/studentApi';
 import { getAttendanceReport } from '../services/attendanceApi';
-import { useAuth } from '../context/AuthContext';
-import { FileText, Download } from 'lucide-react';
+import { Download, FileText } from 'lucide-react';
 import clsx from 'clsx';
 
 const AttendanceReport = () => {
-  const { user } = useAuth();
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState('');
-  
-  // Default to current month
-  const today = new Date();
-  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
-  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0];
-  
-  const [startDate, setStartDate] = useState(firstDay);
-  const [endDate, setEndDate] = useState(lastDay);
+  const [students, setStudents] = useState([]);
+  const [selectedStudent, setSelectedStudent] = useState('');
+  const [startDate, setStartDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    return d.toISOString().split('T')[0];
+  });
+  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
   
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -26,27 +25,40 @@ const AttendanceReport = () => {
     fetchClasses();
   }, []);
 
+  useEffect(() => {
+    if (selectedClass) {
+      fetchStudents(selectedClass);
+    } else {
+      setStudents([]);
+      setSelectedStudent('');
+    }
+  }, [selectedClass]);
+
   const fetchClasses = async () => {
     try {
       const res = await getClasses();
-      if (user.role === 'TEACHER') {
-        const assigned = res.data.classes.filter(c => c.teacher && c.teacher.user._id === user.id);
-        setClasses(assigned);
-      } else {
-        setClasses(res.data.classes);
-      }
+      setClasses(res.data.classes);
     } catch (error) {
       console.error("Failed to fetch classes");
     }
   };
 
+  const fetchStudents = async (classId) => {
+    try {
+      const res = await getStudents(classId);
+      setStudents(res.data.students);
+    } catch (error) {
+      console.error("Failed to fetch students");
+    }
+  };
+
   const handleGenerateReport = async () => {
-    if (!selectedClass || !startDate || !endDate) return alert('Please fill all filters');
+    if (!selectedClass || !startDate || !endDate) return alert('Please fill Class, Start Date, and End Date');
     if (new Date(startDate) > new Date(endDate)) return alert('Start date must be before end date');
 
     setLoading(true);
     try {
-      const res = await getAttendanceReport(selectedClass, startDate, endDate);
+      const res = await getAttendanceReport(selectedClass, startDate, endDate, selectedStudent);
       const fetchedRecords = res.data.records;
       setRecords(fetchedRecords);
 
@@ -67,10 +79,12 @@ const AttendanceReport = () => {
   const exportCSV = () => {
     if (records.length === 0) return;
     
-    const headers = ['Date,Roll No,Name,Status'];
+    const headers = ['Date,Student,Class,Status'];
     const csvData = records.map(r => {
       const dateStr = new Date(r.attendanceDate).toLocaleDateString();
-      return `${dateStr},${r.student.rollNumber},"${r.student.name}",${r.status}`;
+      const className = classes.find(c => c._id === selectedClass);
+      const classStr = className ? `Grade ${className.grade}-${className.section}` : '';
+      return `${dateStr},"${r.student.name}",${classStr},${r.status}`;
     });
     
     const csvContent = headers.concat(csvData).join('\n');
@@ -95,8 +109,8 @@ const AttendanceReport = () => {
         )}
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-end">
-        <div className="flex-1 w-full">
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex flex-col md:flex-row flex-wrap gap-4 items-end">
+        <div className="flex-1 min-w-[200px]">
           <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
           <select 
             value={selectedClass} 
@@ -109,8 +123,23 @@ const AttendanceReport = () => {
             ))}
           </select>
         </div>
+
+        <div className="flex-1 min-w-[200px]">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Student (Optional)</label>
+          <select 
+            value={selectedStudent} 
+            onChange={(e) => setSelectedStudent(e.target.value)}
+            disabled={!selectedClass || students.length === 0}
+            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2 border disabled:bg-gray-100"
+          >
+            <option value="">-- All Students --</option>
+            {students.map(s => (
+              <option key={s._id} value={s._id}>{s.name} ({s.rollNumber})</option>
+            ))}
+          </select>
+        </div>
         
-        <div className="flex-1 w-full">
+        <div className="flex-1 min-w-[150px]">
           <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
           <input 
             type="date" 
@@ -120,7 +149,7 @@ const AttendanceReport = () => {
           />
         </div>
 
-        <div className="flex-1 w-full">
+        <div className="flex-1 min-w-[150px]">
           <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
           <input 
             type="date" 
@@ -168,33 +197,36 @@ const AttendanceReport = () => {
               <thead className="bg-gray-50 sticky top-0 z-10">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roll No</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {records.map(record => (
+                {records.map(record => {
+                  const className = classes.find(c => c._id === selectedClass);
+                  const classStr = className ? `Grade ${className.grade}-${className.section}` : '';
+                  return (
                   <tr key={record._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {new Date(record.attendanceDate).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {record.student.rollNumber}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(record.attendanceDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {record.student.name}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {classStr}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={clsx(
-                        "px-2.5 py-1 text-xs font-medium rounded-full",
-                        record.status === 'PRESENT' ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                        "px-2.5 py-1 text-xs font-medium rounded-full border",
+                        record.status === 'PRESENT' ? "bg-green-50 text-green-700 border-green-200" : "bg-red-50 text-red-700 border-red-200"
                       )}>
-                        {record.status}
+                        {record.status === 'PRESENT' ? 'Present' : 'Absent'}
                       </span>
                     </td>
                   </tr>
-                ))}
+                )})}
               </tbody>
             </table>
           </div>
@@ -202,7 +234,7 @@ const AttendanceReport = () => {
       ) : (
         selectedClass && !loading && (
           <div className="bg-white p-10 rounded-lg shadow-sm border border-gray-100 text-center text-gray-500">
-            No attendance records found for the selected date range.
+            No attendance records found for the selected filters.
           </div>
         )
       )}
