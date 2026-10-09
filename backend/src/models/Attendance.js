@@ -21,6 +21,15 @@ const attendanceSchema = new mongoose.Schema(
       enum: ['PRESENT', 'ABSENT'],
       required: true,
     },
+    auditTrail: [
+      {
+        action: { type: String, enum: ['CREATED', 'UPDATED'] },
+        modifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        timestamp: { type: Date, default: Date.now },
+        oldStatus: String,
+        newStatus: String
+      }
+    ]
   },
   { timestamps: true }
 );

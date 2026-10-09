@@ -48,7 +48,12 @@ export const markAttendance = async (req, res) => {
       student: record.studentId,
       class: classId,
       attendanceDate,
-      status: record.status
+      status: record.status,
+      auditTrail: [{
+        action: 'CREATED',
+        modifiedBy: req.user._id,
+        newStatus: record.status
+      }]
     }));
 
     await Attendance.insertMany(attendanceDocs);
@@ -88,7 +93,8 @@ export const getClassAttendanceByDate = async (req, res) => {
     }
 
     const attendanceRecords = await Attendance.find({ class: classId, attendanceDate })
-      .populate('student', 'name rollNumber');
+      .populate('student', 'name rollNumber')
+      .populate('auditTrail.modifiedBy', 'name role');
 
     return successResponse(res, 200, 'Attendance retrieved successfully', { attendance: attendanceRecords });
   } catch (error) {
@@ -122,10 +128,19 @@ export const updateClassAttendance = async (req, res) => {
     }
 
     await Promise.all(records.map(async (record) => {
-      await Attendance.findOneAndUpdate(
-        { class: classId, attendanceDate, student: record.studentId },
-        { status: record.status }
-      );
+      const existing = await Attendance.findOne({ class: classId, attendanceDate, student: record.studentId });
+      if (existing && existing.status !== record.status) {
+        const oldStatus = existing.status;
+        existing.status = record.status;
+        existing.auditTrail.push({
+          action: 'UPDATED',
+          modifiedBy: req.user._id,
+          oldStatus,
+          newStatus: record.status,
+          timestamp: new Date()
+        });
+        await existing.save();
+      }
     }));
 
     return successResponse(res, 200, 'Attendance updated successfully');
@@ -176,7 +191,10 @@ export const getAttendanceReport = async (req, res) => {
       filter.student = filterStudentId;
     }
 
-    const records = await Attendance.find(filter).populate('student', 'name rollNumber').sort({ attendanceDate: -1 });
+    const records = await Attendance.find(filter)
+      .populate('student', 'name rollNumber')
+      .populate('auditTrail.modifiedBy', 'name role')
+      .sort({ attendanceDate: -1 });
 
     const total = records.length;
     const present = records.filter(r => r.status === 'PRESENT').length;
