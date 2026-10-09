@@ -9,7 +9,6 @@ const studentSchema = new mongoose.Schema(
     rollNumber: {
       type: String,
       required: true,
-      unique: true, // Making roll number globally unique for simplicity, or unique within the school
     },
     class: {
       type: mongoose.Schema.Types.ObjectId,
@@ -20,6 +19,10 @@ const studentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
     guardianContact: {
       type: String,
       required: true,
@@ -27,5 +30,7 @@ const studentSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+studentSchema.index({ class: 1, rollNumber: 1 }, { unique: true });
 
 export default mongoose.model('Student', studentSchema);

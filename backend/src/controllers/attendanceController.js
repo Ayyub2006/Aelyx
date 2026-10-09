@@ -147,12 +147,21 @@ export const getAttendanceReport = async (req, res) => {
     }
 
     // Authorization
+    let filterStudentId = studentId;
+    
     if (req.user.role === 'TEACHER') {
       const teacher = await Teacher.findOne({ user: req.user._id });
       const cls = await Class.findById(classId);
       if (!teacher || !cls || cls.teacher?.toString() !== teacher._id.toString()) {
         return errorResponse(res, 403, 'You are not authorized to view reports for this class');
       }
+    } else if (req.user.role === 'STUDENT') {
+      const student = await Student.findOne({ user: req.user._id });
+      if (!student || student.class.toString() !== classId.toString()) {
+        return errorResponse(res, 403, 'You are not authorized to view reports for this class');
+      }
+      // Force the studentId filter so they can only query themselves
+      filterStudentId = student._id.toString();
     }
 
     let filter = {
@@ -163,8 +172,8 @@ export const getAttendanceReport = async (req, res) => {
       }
     };
 
-    if (studentId) {
-      filter.student = studentId;
+    if (filterStudentId) {
+      filter.student = filterStudentId;
     }
 
     const records = await Attendance.find(filter).populate('student', 'name rollNumber').sort({ attendanceDate: -1 });

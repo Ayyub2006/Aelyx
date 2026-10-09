@@ -17,7 +17,7 @@ const MainLayout = () => {
   };
 
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard, roles: ['ADMIN', 'TEACHER'] },
+    { name: 'Dashboard', path: '/', icon: LayoutDashboard, roles: ['ADMIN', 'TEACHER', 'STUDENT'] },
     { name: 'Teachers', path: '/teachers', icon: Users, roles: ['ADMIN'] },
     { name: 'Classes', path: '/classes', icon: GraduationCap, roles: ['ADMIN', 'TEACHER'] },
     { name: 'Students', path: '/students', icon: Users, roles: ['ADMIN', 'TEACHER'] },

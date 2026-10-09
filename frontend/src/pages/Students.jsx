@@ -244,6 +244,18 @@ const Students = () => {
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
                   <input required type="text" name="name" value={formData.name} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" />
                 </div>
+                {!currentStudent && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">Student Email (Optional)</label>
+                      <input type="email" name="email" value={formData.email || ''} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" placeholder="For student login" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">Password (Optional)</label>
+                      <input type="password" name="password" value={formData.password || ''} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" placeholder="Required if email provided" />
+                    </div>
+                  </>
+                )}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Roll Number</label>
                   <input required disabled={!!currentStudent} type="text" name="rollNumber" value={formData.rollNumber} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all disabled:opacity-60" />

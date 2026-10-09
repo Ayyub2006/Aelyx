@@ -96,6 +96,42 @@ export const getDashboardSummary = async (req, res) => {
         });
         summary.trend = generateTrendData(trendRecords, sevenDaysAgo);
       }
+    } else if (req.user.role === 'STUDENT') {
+      // Student sees stats specific to themselves
+      const student = await Student.findOne({ user: req.user._id }).populate('class');
+      if (student) {
+        summary.studentDetails = {
+          name: student.name,
+          rollNumber: student.rollNumber,
+          className: student.class ? `Grade ${student.class.grade}-${student.class.section}` : 'N/A'
+        };
+
+        const todayAttendance = await Attendance.findOne({
+          student: student._id,
+          attendanceDate: today
+        });
+        
+        if (todayAttendance) {
+          if (todayAttendance.status === 'PRESENT') summary.todayPresent = 1;
+          if (todayAttendance.status === 'ABSENT') summary.todayAbsent = 1;
+        }
+
+        // 7 Day Trend just for this student
+        const trendRecords = await Attendance.find({
+          student: student._id,
+          attendanceDate: { $gte: sevenDaysAgo, $lte: today }
+        });
+        summary.trend = generateTrendData(trendRecords, sevenDaysAgo);
+
+        // Overall attendance for this student
+        const allAttendance = await Attendance.find({ student: student._id });
+        summary.totalAttendanceDays = allAttendance.length;
+        summary.totalPresentDays = allAttendance.filter(a => a.status === 'PRESENT').length;
+        summary.totalAbsentDays = allAttendance.filter(a => a.status === 'ABSENT').length;
+        summary.attendancePercentage = summary.totalAttendanceDays > 0 
+          ? Math.round((summary.totalPresentDays / summary.totalAttendanceDays) * 100) 
+          : 0;
+      }
     }
 
     return successResponse(res, 200, 'Dashboard summary retrieved', summary);

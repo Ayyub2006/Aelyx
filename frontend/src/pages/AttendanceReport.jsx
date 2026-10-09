@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { getClasses } from '../services/classApi';
-import { getStudents } from '../services/studentApi';
+import { getStudents, getMyProfile } from '../services/studentApi';
 import { getAttendanceReport } from '../services/attendanceApi';
 import { Download, FileText } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import clsx from 'clsx';
 
 const AttendanceReport = () => {
+  const { user } = useAuth();
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState('');
   const [students, setStudents] = useState([]);
@@ -23,17 +25,35 @@ const AttendanceReport = () => {
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
-    fetchClasses();
-  }, []);
+    if (user?.role === 'STUDENT') {
+      fetchMyProfile();
+    } else {
+      fetchClasses();
+    }
+  }, [user]);
 
   useEffect(() => {
-    if (selectedClass) {
-      fetchStudents(selectedClass);
-    } else {
-      setStudents([]);
-      setSelectedStudent('');
+    if (user?.role !== 'STUDENT') {
+      if (selectedClass) {
+        fetchStudents(selectedClass);
+      } else {
+        setStudents([]);
+        setSelectedStudent('');
+      }
     }
-  }, [selectedClass]);
+  }, [selectedClass, user]);
+
+  const fetchMyProfile = async () => {
+    try {
+      const res = await getMyProfile();
+      const myStudent = res.data.student;
+      setSelectedClass(myStudent.class._id);
+      setSelectedStudent(myStudent._id);
+      setClasses([{ _id: myStudent.class._id, grade: myStudent.class.grade, section: myStudent.class.section }]);
+    } catch (error) {
+      setErrorMsg("Failed to load student profile");
+    }
+  };
 
   const fetchClasses = async () => {
     try {
@@ -121,7 +141,8 @@ const AttendanceReport = () => {
           <select 
             value={selectedClass} 
             onChange={(e) => setSelectedClass(e.target.value)}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2 border"
+            disabled={user?.role === 'STUDENT'}
+            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2 border disabled:bg-gray-100 disabled:opacity-75"
           >
             <option value="">-- Choose Class --</option>
             {Array.from(new Map(classes.map(c => [c.grade + '-' + c.section, c])).values()).map(c => (
@@ -135,13 +156,17 @@ const AttendanceReport = () => {
           <select 
             value={selectedStudent} 
             onChange={(e) => setSelectedStudent(e.target.value)}
-            disabled={!selectedClass || students.length === 0}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2 border disabled:bg-gray-100"
+            disabled={user?.role === 'STUDENT' || !selectedClass || students.length === 0}
+            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2 border disabled:bg-gray-100 disabled:opacity-75"
           >
             <option value="">-- All Students --</option>
-            {students.map(s => (
-              <option key={s._id} value={s._id}>{s.name} ({s.rollNumber})</option>
-            ))}
+            {user?.role === 'STUDENT' ? (
+              <option value={selectedStudent}>My Report</option>
+            ) : (
+              students.map(s => (
+                <option key={s._id} value={s._id}>{s.name} ({s.rollNumber})</option>
+              ))
+            )}
           </select>
         </div>
         

@@ -64,48 +64,84 @@ const Dashboard = () => {
         
         <div className="relative z-10">
           <h1 className="text-3xl font-bold text-gray-900">Welcome back, <span className="gradient-text">{user?.name}</span>! 👋</h1>
-          <p className="text-gray-500 mt-2 text-lg">Here is what's happening in your {user?.role === 'ADMIN' ? 'school' : 'classes'} today.</p>
+          <p className="text-gray-500 mt-2 text-lg">
+            Here is what's happening in your {user?.role === 'ADMIN' ? 'school' : user?.role === 'STUDENT' ? 'attendance record' : 'classes'} today.
+          </p>
         </div>
       </motion.div>
 
       {/* Stats Grid */}
-      <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        {/* Classes Stat */}
-        <div className="glass-card hover-lift p-6 rounded-2xl flex items-center bg-white/80">
-          <div className="p-4 bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 rounded-xl shadow-inner">
-            <GraduationCap size={28} />
-          </div>
-          <div className="ml-5">
-            <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Classes</p>
-            <p className="text-3xl font-bold text-gray-900 mt-1">{summary?.totalClasses}</p>
-          </div>
-        </div>
-
-        {/* Students Stat */}
-        <div className="glass-card hover-lift p-6 rounded-2xl flex items-center bg-white/80">
-          <div className="p-4 bg-gradient-to-br from-indigo-100 to-indigo-200 text-indigo-600 rounded-xl shadow-inner">
-            <Users size={28} />
-          </div>
-          <div className="ml-5">
-            <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Students</p>
-            <p className="text-3xl font-bold text-gray-900 mt-1">{summary?.totalStudents}</p>
-          </div>
-        </div>
-
-        {/* Teachers Stat (Admin Only) */}
-        {user?.role === 'ADMIN' && (
+      {user?.role !== 'STUDENT' && (
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          {/* Classes Stat */}
           <div className="glass-card hover-lift p-6 rounded-2xl flex items-center bg-white/80">
-            <div className="p-4 bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 rounded-xl shadow-inner">
-              <Users2 size={28} />
+            <div className="p-4 bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 rounded-xl shadow-inner">
+              <GraduationCap size={28} />
             </div>
             <div className="ml-5">
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Teachers</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{summary?.totalTeachers}</p>
+              <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Classes</p>
+              <p className="text-3xl font-bold text-gray-900 mt-1">{summary?.totalClasses || 0}</p>
             </div>
           </div>
-        )}
-      </motion.div>
+
+          {/* Students Stat */}
+          <div className="glass-card hover-lift p-6 rounded-2xl flex items-center bg-white/80">
+            <div className="p-4 bg-gradient-to-br from-indigo-100 to-indigo-200 text-indigo-600 rounded-xl shadow-inner">
+              <Users size={28} />
+            </div>
+            <div className="ml-5">
+              <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Students</p>
+              <p className="text-3xl font-bold text-gray-900 mt-1">{summary?.totalStudents || 0}</p>
+            </div>
+          </div>
+
+          {/* Teachers Stat (Admin Only) */}
+          {user?.role === 'ADMIN' && (
+            <div className="glass-card hover-lift p-6 rounded-2xl flex items-center bg-white/80">
+              <div className="p-4 bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 rounded-xl shadow-inner">
+                <Users2 size={28} />
+              </div>
+              <div className="ml-5">
+                <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Teachers</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{summary?.totalTeachers || 0}</p>
+              </div>
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {user?.role === 'STUDENT' && summary?.studentDetails && (
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="glass-card hover-lift p-6 rounded-2xl flex items-center bg-white/80">
+            <div className="p-4 bg-gradient-to-br from-indigo-100 to-indigo-200 text-indigo-600 rounded-xl shadow-inner">
+              <Users size={28} />
+            </div>
+            <div className="ml-5">
+              <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Student Name</p>
+              <p className="text-xl font-bold text-gray-900 mt-1">{summary.studentDetails.name}</p>
+            </div>
+          </div>
+          <div className="glass-card hover-lift p-6 rounded-2xl flex items-center bg-white/80">
+            <div className="p-4 bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 rounded-xl shadow-inner">
+              <GraduationCap size={28} />
+            </div>
+            <div className="ml-5">
+              <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Class Enrolled</p>
+              <p className="text-xl font-bold text-gray-900 mt-1">{summary.studentDetails.className}</p>
+            </div>
+          </div>
+          <div className="glass-card hover-lift p-6 rounded-2xl flex items-center bg-white/80">
+            <div className="p-4 bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 rounded-xl shadow-inner">
+              <CheckCircle size={28} />
+            </div>
+            <div className="ml-5">
+              <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Roll Number</p>
+              <p className="text-xl font-bold text-gray-900 mt-1">{summary.studentDetails.rollNumber}</p>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-10">
         
@@ -154,20 +190,24 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        {/* Today's Attendance Overview */}
+        {/* Attendance Overview */}
         <motion.div variants={itemVariants} className="flex flex-col gap-6">
           <div className="glass-card p-8 rounded-2xl gradient-bg text-white shadow-lg flex flex-col justify-center items-center relative overflow-hidden h-full min-h-[220px]">
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
             <div className="relative z-10 text-center w-full">
-              <p className="text-indigo-100 font-medium uppercase tracking-widest text-sm mb-2">Today's Rate</p>
+              <p className="text-indigo-100 font-medium uppercase tracking-widest text-sm mb-2">
+                {user?.role === 'STUDENT' ? "Overall Rate" : "Today's Rate"}
+              </p>
               <div className="flex items-end justify-center mb-4">
-                <span className="text-7xl font-black tracking-tighter">{attendancePercentage}</span>
+                <span className="text-7xl font-black tracking-tighter">
+                  {user?.role === 'STUDENT' ? summary?.attendancePercentage : attendancePercentage}
+                </span>
                 <span className="text-3xl font-bold text-indigo-200 mb-2 ml-1">%</span>
               </div>
               <div className="w-full bg-indigo-900/40 rounded-full h-3 mt-2 overflow-hidden shadow-inner p-0.5">
                 <motion.div 
                   initial={{ width: 0 }}
-                  animate={{ width: `${attendancePercentage}%` }}
+                  animate={{ width: `${user?.role === 'STUDENT' ? summary?.attendancePercentage : attendancePercentage}%` }}
                   transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
                   className="bg-white h-2 rounded-full" 
                 />
@@ -178,8 +218,12 @@ const Dashboard = () => {
           <div className="flex gap-4">
             <div className="flex-1 glass-card p-5 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-between group">
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Present</p>
-                <p className="text-2xl font-bold text-gray-900">{summary?.todayPresent}</p>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                  {user?.role === 'STUDENT' ? 'Total Present' : 'Present'}
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {user?.role === 'STUDENT' ? summary?.totalPresentDays : summary?.todayPresent}
+                </p>
               </div>
               <div className="p-2.5 bg-green-50 text-green-500 rounded-xl group-hover:scale-110 transition-transform">
                 <CheckCircle size={24} />
@@ -188,8 +232,12 @@ const Dashboard = () => {
             
             <div className="flex-1 glass-card p-5 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-between group">
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Absent</p>
-                <p className="text-2xl font-bold text-gray-900">{summary?.todayAbsent}</p>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                  {user?.role === 'STUDENT' ? 'Total Absent' : 'Absent'}
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {user?.role === 'STUDENT' ? summary?.totalAbsentDays : summary?.todayAbsent}
+                </p>
               </div>
               <div className="p-2.5 bg-red-50 text-red-500 rounded-xl group-hover:scale-110 transition-transform">
                 <XCircle size={24} />
@@ -201,34 +249,36 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Links */}
-      <motion.div variants={itemVariants} className="mt-10 pt-6 border-t border-gray-100">
-        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-          <span className="w-2 h-8 bg-secondary rounded-full mr-3 inline-block"></span>
-          Quick Actions
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link to="/attendance" className="group p-5 bg-white border border-indigo-100 rounded-xl text-indigo-700 font-medium hover:bg-indigo-50 hover:border-indigo-300 transition-all shadow-sm flex items-center justify-between">
-            <span>Mark Attendance</span>
-            <ArrowRight size={18} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-          </Link>
-          <Link to="/reports" className="group p-5 bg-white border border-emerald-100 rounded-xl text-emerald-700 font-medium hover:bg-emerald-50 hover:border-emerald-300 transition-all shadow-sm flex items-center justify-between">
-            <span>View Reports</span>
-            <ArrowRight size={18} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-          </Link>
-          {user?.role === 'ADMIN' && (
-            <>
-              <Link to="/students" className="group p-5 bg-white border border-amber-100 rounded-xl text-amber-700 font-medium hover:bg-amber-50 hover:border-amber-300 transition-all shadow-sm flex items-center justify-between">
-                <span>Manage Students</span>
-                <ArrowRight size={18} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-              </Link>
-              <Link to="/teachers" className="group p-5 bg-white border border-purple-100 rounded-xl text-purple-700 font-medium hover:bg-purple-50 hover:border-purple-300 transition-all shadow-sm flex items-center justify-between">
-                <span>Manage Teachers</span>
-                <ArrowRight size={18} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-              </Link>
-            </>
-          )}
-        </div>
-      </motion.div>
+      {user?.role !== 'STUDENT' && (
+        <motion.div variants={itemVariants} className="mt-10 pt-6 border-t border-gray-100">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+            <span className="w-2 h-8 bg-secondary rounded-full mr-3 inline-block"></span>
+            Quick Actions
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link to="/attendance" className="group p-5 bg-white border border-indigo-100 rounded-xl text-indigo-700 font-medium hover:bg-indigo-50 hover:border-indigo-300 transition-all shadow-sm flex items-center justify-between">
+              <span>Mark Attendance</span>
+              <ArrowRight size={18} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+            </Link>
+            <Link to="/reports" className="group p-5 bg-white border border-emerald-100 rounded-xl text-emerald-700 font-medium hover:bg-emerald-50 hover:border-emerald-300 transition-all shadow-sm flex items-center justify-between">
+              <span>View Reports</span>
+              <ArrowRight size={18} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+            </Link>
+            {user?.role === 'ADMIN' && (
+              <>
+                <Link to="/students" className="group p-5 bg-white border border-amber-100 rounded-xl text-amber-700 font-medium hover:bg-amber-50 hover:border-amber-300 transition-all shadow-sm flex items-center justify-between">
+                  <span>Manage Students</span>
+                  <ArrowRight size={18} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                </Link>
+                <Link to="/teachers" className="group p-5 bg-white border border-purple-100 rounded-xl text-purple-700 font-medium hover:bg-purple-50 hover:border-purple-300 transition-all shadow-sm flex items-center justify-between">
+                  <span>Manage Teachers</span>
+                  <ArrowRight size={18} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                </Link>
+              </>
+            )}
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 };

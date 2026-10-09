@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.use(protect);
 
-router.get('/report', authorizeRoles('ADMIN', 'TEACHER'), getAttendanceReport);
+router.get('/report', authorizeRoles('ADMIN', 'TEACHER', 'STUDENT'), getAttendanceReport);
 router.post('/', authorizeRoles('TEACHER'), markAttendance);
 router.get('/class/:classId', authorizeRoles('ADMIN', 'TEACHER'), getClassAttendanceByDate);
 router.put('/class/:classId', authorizeRoles('TEACHER'), updateClassAttendance);

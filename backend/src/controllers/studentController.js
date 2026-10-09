@@ -1,5 +1,6 @@
 import Student from '../models/Student.js';
 import Class from '../models/Class.js';
+import User from '../models/User.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
 
 // @desc    Get all students
@@ -41,7 +42,7 @@ export const getStudents = async (req, res) => {
       }
     }
 
-    const students = await Student.find(query).populate('class', 'grade section');
+    const students = await Student.find(query).populate('class', 'grade section').populate('user', 'email');
     return successResponse(res, 200, 'Students retrieved successfully', { students });
   } catch (error) {
     console.error(error);
@@ -54,7 +55,7 @@ export const getStudents = async (req, res) => {
 // @access  Private/Admin
 export const getStudentById = async (req, res) => {
   try {
-    const student = await Student.findById(req.params.id).populate('class', 'grade section teacher');
+    const student = await Student.findById(req.params.id).populate('class', 'grade section teacher').populate('user', 'email');
     if (!student) {
       return errorResponse(res, 404, 'Student not found');
     }
@@ -65,6 +66,10 @@ export const getStudentById = async (req, res) => {
       
       const studentClass = await Class.findById(student.class._id);
       if (!studentClass || studentClass.teacher?.toString() !== teacher._id.toString()) {
+        return errorResponse(res, 403, 'Not authorized to view this student');
+      }
+    } else if (req.user.role === 'STUDENT') {
+      if (student.user?.toString() !== req.user._id.toString()) {
         return errorResponse(res, 403, 'Not authorized to view this student');
       }
     }
@@ -81,12 +86,12 @@ export const getStudentById = async (req, res) => {
 // @access  Private/Admin
 export const createStudent = async (req, res) => {
   try {
-    const { name, rollNumber, classId, guardianContact } = req.body;
+    const { name, rollNumber, classId, guardianContact, email, password } = req.body;
 
-    // Check if roll number exists
-    const studentExists = await Student.findOne({ rollNumber });
+    // Check if roll number exists in this class
+    const studentExists = await Student.findOne({ rollNumber, class: classId });
     if (studentExists) {
-      return errorResponse(res, 400, 'Student with this roll number already exists');
+      return errorResponse(res, 400, 'Student with this roll number already exists in this class');
     }
 
     // Check if class exists
@@ -95,20 +100,43 @@ export const createStudent = async (req, res) => {
       return errorResponse(res, 404, 'Class not found');
     }
 
+    let userId = null;
+    if (email || password) {
+      if (!email || !password) {
+        return errorResponse(res, 400, 'Both email and password are required to create a student login account');
+      }
+      if (password.length < 6) {
+        return errorResponse(res, 400, 'Password must be at least 6 characters');
+      }
+      
+      const userExists = await User.findOne({ email });
+      if (userExists) {
+        return errorResponse(res, 400, 'User with this email already exists');
+      }
+      const user = await User.create({
+        name,
+        email,
+        password,
+        role: 'STUDENT'
+      });
+      userId = user._id;
+    }
+
     const student = await Student.create({
       name,
       rollNumber,
       class: classId,
       section: classExists.section,
       guardianContact,
+      user: userId
     });
 
-    const populatedStudent = await Student.findById(student._id).populate('class', 'grade section');
+    const populatedStudent = await Student.findById(student._id).populate('class', 'grade section').populate('user', 'email');
 
     return successResponse(res, 201, 'Student created successfully', { student: populatedStudent });
   } catch (error) {
     console.error(error);
-    return errorResponse(res, 500, 'Server Error');
+    return errorResponse(res, 500, error.message || 'Server Error');
   }
 };
 
@@ -133,12 +161,17 @@ export const updateStudent = async (req, res) => {
       student.section = classExists.section;
     }
 
-    if (name) student.name = name;
+    if (name) {
+      student.name = name;
+      if (student.user) {
+        await User.findByIdAndUpdate(student.user, { name });
+      }
+    }
     if (guardianContact) student.guardianContact = guardianContact;
 
     await student.save();
 
-    const updatedStudent = await Student.findById(req.params.id).populate('class', 'grade section');
+    const updatedStudent = await Student.findById(req.params.id).populate('class', 'grade section').populate('user', 'email');
 
     return successResponse(res, 200, 'Student updated successfully', { student: updatedStudent });
   } catch (error) {
@@ -157,6 +190,9 @@ export const deleteStudent = async (req, res) => {
       return errorResponse(res, 404, 'Student not found');
     }
     
+    if (student.user) {
+      await User.findByIdAndDelete(student.user);
+    }
     await Student.findByIdAndDelete(req.params.id);
 
     return successResponse(res, 200, 'Student deleted successfully');

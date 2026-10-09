@@ -6,6 +6,11 @@ export const getStudents = async (classId) => {
   return data;
 };
 
+export const getMyProfile = async () => {
+  const { data } = await api.get('/students/me');
+  return data;
+};
+
 export const createStudent = async (studentData) => {
   const { data } = await api.post('/students', studentData);
   return data;
