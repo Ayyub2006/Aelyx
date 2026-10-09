@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: aelyx-backend
+    env: node
+    plan: free
+    region: ohio
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGO_URI
+        sync: false # User must provide this in the Render dashboard
