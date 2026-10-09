@@ -15,11 +15,14 @@ const classSchema = new mongoose.Schema(
       ref: 'Teacher',
       default: null,
     },
+    period: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );
 
-// Optional: ensure class combinations are unique
-classSchema.index({ grade: 1, section: 1 }, { unique: true });
+// We allow multiple classes with same grade/section but different periods/teachers.
 
 export default mongoose.model('Class', classSchema);

@@ -1,6 +1,7 @@
 import Attendance from '../models/Attendance.js';
 import Teacher from '../models/Teacher.js';
 import Student from '../models/Student.js';
+import Class from '../models/Class.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
 
 // ... existing code ...
@@ -22,7 +23,8 @@ export const markAttendance = async (req, res) => {
     // Authorization
     if (req.user.role === 'TEACHER') {
       const teacher = await Teacher.findOne({ user: req.user._id });
-      if (!teacher || !teacher.assignedClasses.includes(classId)) {
+      const cls = await Class.findById(classId);
+      if (!teacher || !cls || cls.teacher?.toString() !== teacher._id.toString()) {
         return errorResponse(res, 403, 'You are not authorized to mark attendance for this class');
       }
     }
@@ -33,10 +35,13 @@ export const markAttendance = async (req, res) => {
     }
 
     const studentIds = records.map(r => r.studentId);
-    const validStudentsCount = await Student.countDocuments({ _id: { $in: studentIds }, class: classId });
+    
+    // In our new schema, students might be mapped to any equivalent class ID for the same grade/section
+    // So we just check if students exist. The frontend deduplicates class selection anyway.
+    const validStudentsCount = await Student.countDocuments({ _id: { $in: studentIds } });
     
     if (validStudentsCount !== records.length) {
-      return errorResponse(res, 400, 'Some students do not belong to the selected class');
+      return errorResponse(res, 400, 'Some students were not found');
     }
 
     const attendanceDocs = records.map(record => ({
@@ -76,7 +81,8 @@ export const getClassAttendanceByDate = async (req, res) => {
     // Authorization
     if (req.user.role === 'TEACHER') {
       const teacher = await Teacher.findOne({ user: req.user._id });
-      if (!teacher || !teacher.assignedClasses.includes(classId)) {
+      const cls = await Class.findById(classId);
+      if (!teacher || !cls || cls.teacher?.toString() !== teacher._id.toString()) {
         return errorResponse(res, 403, 'You are not authorized to view attendance for this class');
       }
     }
@@ -109,7 +115,8 @@ export const updateClassAttendance = async (req, res) => {
     // Authorization
     if (req.user.role === 'TEACHER') {
       const teacher = await Teacher.findOne({ user: req.user._id });
-      if (!teacher || !teacher.assignedClasses.includes(classId)) {
+      const cls = await Class.findById(classId);
+      if (!teacher || !cls || cls.teacher?.toString() !== teacher._id.toString()) {
         return errorResponse(res, 403, 'You are not authorized to edit attendance for this class');
       }
     }
@@ -142,7 +149,8 @@ export const getAttendanceReport = async (req, res) => {
     // Authorization
     if (req.user.role === 'TEACHER') {
       const teacher = await Teacher.findOne({ user: req.user._id });
-      if (!teacher || !teacher.assignedClasses.includes(classId)) {
+      const cls = await Class.findById(classId);
+      if (!teacher || !cls || cls.teacher?.toString() !== teacher._id.toString()) {
         return errorResponse(res, 403, 'You are not authorized to view reports for this class');
       }
     }

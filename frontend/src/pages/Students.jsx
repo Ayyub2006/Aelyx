@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { getStudents, createStudent, updateStudent, deleteStudent } from '../services/studentApi';
 import { getClasses } from '../services/classApi';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Students = () => {
+  const { user } = useAuth();
   const [students, setStudents] = useState([]);
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -102,17 +104,19 @@ const Students = () => {
             className="rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border"
           >
             <option value="">All Classes</option>
-            {classes.map(c => (
+            {Array.from(new Map(classes.map(c => [c.grade + '-' + c.section, c])).values()).map(c => (
               <option key={c._id} value={c._id}>Grade {c.grade}-{c.section}</option>
             ))}
           </select>
 
-          <button
-            onClick={openAddModal}
-            className="flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-indigo-700"
-          >
-            <Plus size={18} className="mr-2" /> Add Student
-          </button>
+          {user?.role === 'ADMIN' && (
+            <button
+              onClick={openAddModal}
+              className="flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-indigo-700"
+            >
+              <Plus size={18} className="mr-2" /> Add Student
+            </button>
+          )}
         </div>
       </div>
 
@@ -126,7 +130,9 @@ const Students = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Guardian Contact</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                {user?.role === 'ADMIN' && (
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                )}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -143,14 +149,16 @@ const Students = () => {
                       {student.class ? `${student.class.grade}-${student.class.section}` : 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.guardianContact}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button onClick={() => handleEdit(student)} className="text-indigo-600 hover:text-indigo-900 mr-4">
-                        <Edit2 size={18} />
-                      </button>
-                      <button onClick={() => handleDelete(student._id)} className="text-red-600 hover:text-red-900">
-                        <Trash2 size={18} />
-                      </button>
-                    </td>
+                    {user?.role === 'ADMIN' && (
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onClick={() => handleEdit(student)} className="text-indigo-600 hover:text-indigo-900 mr-4">
+                          <Edit2 size={18} />
+                        </button>
+                        <button onClick={() => handleDelete(student._id)} className="text-red-600 hover:text-red-900">
+                          <Trash2 size={18} />
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}
@@ -177,7 +185,7 @@ const Students = () => {
                 <label className="block text-sm font-medium text-gray-700">Class</label>
                 <select required name="classId" value={formData.classId} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border">
                   <option value="">Select a Class</option>
-                  {classes.map(c => (
+                  {Array.from(new Map(classes.map(c => [c.grade + '-' + c.section, c])).values()).map(c => (
                     <option key={c._id} value={c._id}>Grade {c.grade}-{c.section}</option>
                   ))}
                 </select>

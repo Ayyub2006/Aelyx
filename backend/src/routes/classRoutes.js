@@ -1,5 +1,5 @@
 import express from 'express';
-import { getClasses, createClass } from '../controllers/classController.js';
+import { getClasses, createClass, updateClass, deleteClass } from '../controllers/classController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { authorizeRoles } from '../middleware/roleMiddleware.js';
 
@@ -12,6 +12,7 @@ router.use(protect);
 router.get('/', authorizeRoles('ADMIN', 'TEACHER'), getClasses);
 router.post('/', authorizeRoles('ADMIN'), createClass);
 
-// Note: I left out update/delete for brevity, we can add them later if needed.
+router.put('/:id', authorizeRoles('ADMIN'), updateClass);
+router.delete('/:id', authorizeRoles('ADMIN'), deleteClass);
 
 export default router;

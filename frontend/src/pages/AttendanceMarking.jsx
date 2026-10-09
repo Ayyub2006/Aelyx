@@ -145,7 +145,7 @@ const AttendanceMarking = () => {
             className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2 border"
           >
             <option value="">-- Choose Class --</option>
-            {classes.map(c => (
+            {Array.from(new Map(classes.map(c => [c.grade + '-' + c.section, c])).values()).map(c => (
               <option key={c._id} value={c._id}>Grade {c.grade} - Section {c.section}</option>
             ))}
           </select>
@@ -171,14 +171,16 @@ const AttendanceMarking = () => {
               <span className="font-semibold text-green-600">Present: {presentCount}</span>
               <span className="font-semibold text-red-600">Absent: {absentCount}</span>
             </div>
-            <div className="flex space-x-3">
-              <button onClick={() => markAll('PRESENT')} className="px-3 py-1.5 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors">
-                Mark All Present
-              </button>
-              <button onClick={() => markAll('ABSENT')} className="px-3 py-1.5 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors">
-                Mark All Absent
-              </button>
-            </div>
+            {user?.role !== 'ADMIN' && (
+              <div className="flex space-x-3">
+                <button onClick={() => markAll('PRESENT')} className="px-3 py-1.5 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors">
+                  Mark All Present
+                </button>
+                <button onClick={() => markAll('ABSENT')} className="px-3 py-1.5 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors">
+                  Mark All Absent
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="overflow-x-auto">
@@ -209,11 +211,14 @@ const AttendanceMarking = () => {
                           <button
                             type="button"
                             onClick={() => toggleStatus(student._id, 'PRESENT')}
+                            disabled={user?.role === 'ADMIN'}
                             className={clsx(
                               "relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 text-sm font-medium",
                               attendance[student._id] === 'PRESENT' 
                                 ? "bg-green-500 text-white border-green-500 z-10" 
-                                : "bg-white text-gray-700 hover:bg-gray-50"
+                                : "bg-white text-gray-700",
+                              user?.role !== 'ADMIN' && attendance[student._id] !== 'PRESENT' ? "hover:bg-gray-50" : "",
+                              user?.role === 'ADMIN' ? "cursor-not-allowed opacity-80" : ""
                             )}
                           >
                             <Check size={16} className="mr-1" /> Present
@@ -221,11 +226,14 @@ const AttendanceMarking = () => {
                           <button
                             type="button"
                             onClick={() => toggleStatus(student._id, 'ABSENT')}
+                            disabled={user?.role === 'ADMIN'}
                             className={clsx(
                               "relative inline-flex items-center px-4 py-2 rounded-r-md border border-l-0 border-gray-300 text-sm font-medium",
                               attendance[student._id] === 'ABSENT' 
                                 ? "bg-red-500 text-white border-red-500 z-10" 
-                                : "bg-white text-gray-700 hover:bg-gray-50"
+                                : "bg-white text-gray-700",
+                              user?.role !== 'ADMIN' && attendance[student._id] !== 'ABSENT' ? "hover:bg-gray-50" : "",
+                              user?.role === 'ADMIN' ? "cursor-not-allowed opacity-80" : ""
                             )}
                           >
                             <X size={16} className="mr-1" /> Absent
@@ -239,19 +247,21 @@ const AttendanceMarking = () => {
             </table>
           </div>
 
-          <div className="p-4 border-t bg-gray-50 flex justify-end">
-            <button
-              onClick={handleSubmit}
-              disabled={students.length === 0 || loading}
-              className={clsx(
-                "flex items-center px-6 py-2.5 text-white rounded-md transition-colors shadow-sm disabled:opacity-50",
-                isEditMode ? "bg-amber-600 hover:bg-amber-700" : "bg-primary hover:bg-indigo-700"
-              )}
-            >
-              <Save size={18} className="mr-2" /> 
-              {isEditMode ? 'Update Attendance' : 'Save Attendance'}
-            </button>
-          </div>
+          {user?.role !== 'ADMIN' && (
+            <div className="p-4 border-t bg-gray-50 flex justify-end">
+              <button
+                onClick={handleSubmit}
+                disabled={students.length === 0 || loading}
+                className={clsx(
+                  "flex items-center px-6 py-2.5 text-white rounded-md transition-colors shadow-sm disabled:opacity-50",
+                  isEditMode ? "bg-amber-600 hover:bg-amber-700" : "bg-primary hover:bg-indigo-700"
+                )}
+              >
+                <Save size={18} className="mr-2" /> 
+                {isEditMode ? 'Update Attendance' : 'Save Attendance'}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

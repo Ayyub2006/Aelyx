@@ -11,17 +11,13 @@ import { authorizeRoles } from '../middleware/roleMiddleware.js';
 
 const router = express.Router();
 
-// All student routes are protected and restricted to ADMIN
 router.use(protect);
-router.use(authorizeRoles('ADMIN'));
 
-router.route('/')
-  .get(getStudents)
-  .post(createStudent);
+router.get('/', authorizeRoles('ADMIN', 'TEACHER'), getStudents);
+router.post('/', authorizeRoles('ADMIN'), createStudent);
 
-router.route('/:id')
-  .get(getStudentById)
-  .put(updateStudent)
-  .delete(deleteStudent);
+router.get('/:id', authorizeRoles('ADMIN', 'TEACHER'), getStudentById);
+router.put('/:id', authorizeRoles('ADMIN'), updateStudent);
+router.delete('/:id', authorizeRoles('ADMIN'), deleteStudent);
 
 export default router;

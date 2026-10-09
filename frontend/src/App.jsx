@@ -25,11 +25,11 @@ const App = () => {
               
               <Route element={<RoleRoute roles={['ADMIN']} />}>
                 <Route path="/teachers" element={<Teachers />} />
-                <Route path="/classes" element={<Classes />} />
-                <Route path="/students" element={<Students />} />
               </Route>
               
               <Route element={<RoleRoute roles={['ADMIN', 'TEACHER']} />}>
+                <Route path="/classes" element={<Classes />} />
+                <Route path="/students" element={<Students />} />
                 <Route path="/attendance" element={<AttendanceMarking />} />
                 <Route path="/reports" element={<AttendanceReport />} />
               </Route>

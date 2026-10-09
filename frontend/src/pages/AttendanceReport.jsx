@@ -104,7 +104,7 @@ const AttendanceReport = () => {
             className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2 border"
           >
             <option value="">-- Choose Class --</option>
-            {classes.map(c => (
+            {Array.from(new Map(classes.map(c => [c.grade + '-' + c.section, c])).values()).map(c => (
               <option key={c._id} value={c._id}>Grade {c.grade} - Section {c.section}</option>
             ))}
           </select>

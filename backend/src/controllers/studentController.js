@@ -4,15 +4,41 @@ import { successResponse, errorResponse } from '../utils/apiResponse.js';
 
 // @desc    Get all students
 // @route   GET /api/students
-// @access  Private/Admin
+// @access  Private (Admin/Teacher)
 export const getStudents = async (req, res) => {
   try {
     const { classId } = req.query;
-    
-    // Allow filtering by class
     let query = {};
-    if (classId) {
-      query.class = classId;
+    
+    if (req.user.role === 'TEACHER') {
+      const teacher = await import('../models/Teacher.js').then(m => m.default.findOne({ user: req.user._id }));
+      if (!teacher) return errorResponse(res, 403, 'Teacher profile not found');
+      
+      // Teacher can only see classes where they are the assigned teacher
+      const myClasses = await Class.find({ teacher: teacher._id }).select('_id');
+      const myClassIds = myClasses.map(c => c._id.toString());
+      
+      if (classId) {
+        if (!myClassIds.includes(classId.toString())) {
+          return errorResponse(res, 403, 'Not assigned to this class');
+        }
+        
+        const selectedClass = await Class.findById(classId);
+        if (selectedClass) {
+          const equivalentClasses = await Class.find({ grade: selectedClass.grade, section: selectedClass.section }).select('_id');
+          query.class = { $in: equivalentClasses.map(c => c._id) };
+        }
+      } else {
+        query.class = { $in: myClassIds };
+      }
+    } else {
+      if (classId) {
+        const selectedClass = await Class.findById(classId);
+        if (selectedClass) {
+          const equivalentClasses = await Class.find({ grade: selectedClass.grade, section: selectedClass.section }).select('_id');
+          query.class = { $in: equivalentClasses.map(c => c._id) };
+        }
+      }
     }
 
     const students = await Student.find(query).populate('class', 'grade section');
