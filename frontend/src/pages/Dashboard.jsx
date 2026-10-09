@@ -58,7 +58,7 @@ const Dashboard = () => {
       initial="hidden"
       animate="show"
     >
-      <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-start md:items-end bg-white p-8 rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
+      <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-start md:items-end glass-card p-8 rounded-2xl shadow-sm border border-white/50 overflow-hidden relative">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl -ml-20 -mb-20 pointer-events-none"></div>
         
@@ -75,7 +75,7 @@ const Dashboard = () => {
         <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           
           {/* Classes Stat */}
-          <div className="glass-card hover-lift p-6 rounded-2xl flex items-center bg-white/80">
+          <div className="glass-card hover-lift p-6 rounded-2xl flex items-center ">
             <div className="p-4 bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 rounded-xl shadow-inner">
               <GraduationCap size={28} />
             </div>
@@ -86,7 +86,7 @@ const Dashboard = () => {
           </div>
 
           {/* Students Stat */}
-          <div className="glass-card hover-lift p-6 rounded-2xl flex items-center bg-white/80">
+          <div className="glass-card hover-lift p-6 rounded-2xl flex items-center ">
             <div className="p-4 bg-gradient-to-br from-indigo-100 to-indigo-200 text-indigo-600 rounded-xl shadow-inner">
               <Users size={28} />
             </div>
@@ -98,7 +98,7 @@ const Dashboard = () => {
 
           {/* Teachers Stat (Admin Only) */}
           {user?.role === 'ADMIN' && (
-            <div className="glass-card hover-lift p-6 rounded-2xl flex items-center bg-white/80">
+            <div className="glass-card hover-lift p-6 rounded-2xl flex items-center ">
               <div className="p-4 bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 rounded-xl shadow-inner">
                 <Users2 size={28} />
               </div>
@@ -113,7 +113,7 @@ const Dashboard = () => {
 
       {user?.role === 'STUDENT' && summary?.studentDetails && (
         <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="glass-card hover-lift p-6 rounded-2xl flex items-center bg-white/80">
+          <div className="glass-card hover-lift p-6 rounded-2xl flex items-center ">
             <div className="p-4 bg-gradient-to-br from-indigo-100 to-indigo-200 text-indigo-600 rounded-xl shadow-inner">
               <Users size={28} />
             </div>
@@ -122,7 +122,7 @@ const Dashboard = () => {
               <p className="text-xl font-bold text-gray-900 mt-1">{summary.studentDetails.name}</p>
             </div>
           </div>
-          <div className="glass-card hover-lift p-6 rounded-2xl flex items-center bg-white/80">
+          <div className="glass-card hover-lift p-6 rounded-2xl flex items-center ">
             <div className="p-4 bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 rounded-xl shadow-inner">
               <GraduationCap size={28} />
             </div>
@@ -131,7 +131,7 @@ const Dashboard = () => {
               <p className="text-xl font-bold text-gray-900 mt-1">{summary.studentDetails.className}</p>
             </div>
           </div>
-          <div className="glass-card hover-lift p-6 rounded-2xl flex items-center bg-white/80">
+          <div className="glass-card hover-lift p-6 rounded-2xl flex items-center ">
             <div className="p-4 bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 rounded-xl shadow-inner">
               <CheckCircle size={28} />
             </div>
@@ -147,13 +147,13 @@ const Dashboard = () => {
         
         {/* Graph Section */}
         <motion.div variants={itemVariants} className="lg:col-span-2">
-          <div className="glass-card bg-white/80 p-8 rounded-2xl h-full flex flex-col">
+          <div className="glass-card  p-8 rounded-2xl h-full flex flex-col">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-xl font-bold text-gray-900 flex items-center">
                 <span className="w-2 h-8 bg-accent rounded-full mr-3 inline-block"></span>
                 7-Day Attendance Trend
               </h2>
-              <div className="flex items-center text-sm font-medium text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+              <div className="flex items-center text-sm font-medium text-gray-500 bg-white/30 px-3 py-1.5 rounded-full border border-white/50">
                 <TrendingUp size={16} className="mr-2 text-accent" /> Live Data
               </div>
             </div>
@@ -209,14 +209,14 @@ const Dashboard = () => {
                   initial={{ width: 0 }}
                   animate={{ width: `${user?.role === 'STUDENT' ? summary?.attendancePercentage : attendancePercentage}%` }}
                   transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
-                  className="bg-white h-2 rounded-full" 
+                  className="glass-card h-2 rounded-full" 
                 />
               </div>
             </div>
           </div>
           
           <div className="flex gap-4">
-            <div className="flex-1 glass-card p-5 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-between group">
+            <div className="flex-1 glass-card p-5 rounded-2xl glass-card border border-white/50 shadow-sm flex items-center justify-between group">
               <div>
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
                   {user?.role === 'STUDENT' ? 'Total Present' : 'Present'}
@@ -230,7 +230,7 @@ const Dashboard = () => {
               </div>
             </div>
             
-            <div className="flex-1 glass-card p-5 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-between group">
+            <div className="flex-1 glass-card p-5 rounded-2xl glass-card border border-white/50 shadow-sm flex items-center justify-between group">
               <div>
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
                   {user?.role === 'STUDENT' ? 'Total Absent' : 'Absent'}
@@ -250,27 +250,27 @@ const Dashboard = () => {
 
       {/* Quick Links */}
       {user?.role !== 'STUDENT' && (
-        <motion.div variants={itemVariants} className="mt-10 pt-6 border-t border-gray-100">
+        <motion.div variants={itemVariants} className="mt-10 pt-6 border-t border-white/50">
           <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
             <span className="w-2 h-8 bg-secondary rounded-full mr-3 inline-block"></span>
             Quick Actions
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link to="/attendance" className="group p-5 bg-white border border-indigo-100 rounded-xl text-indigo-700 font-medium hover:bg-indigo-50 hover:border-indigo-300 transition-all shadow-sm flex items-center justify-between">
+            <Link to="/attendance" className="group p-5 glass-card border border-indigo-100 rounded-xl text-indigo-700 font-medium hover:bg-indigo-50 hover:border-indigo-300 transition-all shadow-sm flex items-center justify-between">
               <span>Mark Attendance</span>
               <ArrowRight size={18} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
             </Link>
-            <Link to="/reports" className="group p-5 bg-white border border-emerald-100 rounded-xl text-emerald-700 font-medium hover:bg-emerald-50 hover:border-emerald-300 transition-all shadow-sm flex items-center justify-between">
+            <Link to="/reports" className="group p-5 glass-card border border-emerald-100 rounded-xl text-emerald-700 font-medium hover:bg-emerald-50 hover:border-emerald-300 transition-all shadow-sm flex items-center justify-between">
               <span>View Reports</span>
               <ArrowRight size={18} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
             </Link>
             {user?.role === 'ADMIN' && (
               <>
-                <Link to="/students" className="group p-5 bg-white border border-amber-100 rounded-xl text-amber-700 font-medium hover:bg-amber-50 hover:border-amber-300 transition-all shadow-sm flex items-center justify-between">
+                <Link to="/students" className="group p-5 glass-card border border-amber-100 rounded-xl text-amber-700 font-medium hover:bg-amber-50 hover:border-amber-300 transition-all shadow-sm flex items-center justify-between">
                   <span>Manage Students</span>
                   <ArrowRight size={18} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </Link>
-                <Link to="/teachers" className="group p-5 bg-white border border-purple-100 rounded-xl text-purple-700 font-medium hover:bg-purple-50 hover:border-purple-300 transition-all shadow-sm flex items-center justify-between">
+                <Link to="/teachers" className="group p-5 glass-card border border-purple-100 rounded-xl text-purple-700 font-medium hover:bg-purple-50 hover:border-purple-300 transition-all shadow-sm flex items-center justify-between">
                   <span>Manage Teachers</span>
                   <ArrowRight size={18} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </Link>

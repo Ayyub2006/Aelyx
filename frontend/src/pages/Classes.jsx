@@ -110,7 +110,7 @@ const Classes = () => {
             <input
               type="text"
               placeholder="Search classes..."
-              className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors shadow-sm"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl glass-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors shadow-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -127,10 +127,10 @@ const Classes = () => {
         </div>
       </div>
 
-      <div className="glass-card rounded-2xl overflow-hidden bg-white/80 border border-gray-100">
+      <div className="glass-card rounded-2xl overflow-hidden  border border-white/50">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-100">
-            <thead className="bg-gray-50/50">
+            <thead className="bg-white/30/50">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Grade - Section</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Schedule / Period</th>
@@ -147,7 +147,7 @@ const Classes = () => {
                     <div className="flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>
                   </td></tr>
                 ) : filteredClasses.length === 0 ? (
-                  <tr><td colSpan="4" className="px-6 py-10 text-center text-gray-500 font-medium bg-gray-50/30">No classes found matching your criteria.</td></tr>
+                  <tr><td colSpan="4" className="px-6 py-10 text-center text-gray-500 font-medium bg-white/30/30">No classes found matching your criteria.</td></tr>
                 ) : (
                   filteredClasses.map((cls, index) => (
                     <motion.tr 
@@ -220,9 +220,9 @@ const Classes = () => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white rounded-2xl max-w-md w-full shadow-2xl relative z-10 overflow-hidden border border-gray-100"
+              className="glass-card rounded-2xl max-w-md w-full shadow-2xl relative z-10 overflow-hidden border border-white/50"
             >
-              <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <div className="px-6 py-4 border-b border-white/50 flex justify-between items-center bg-white/30/50">
                 <h2 className="text-lg font-bold text-gray-900">{currentClass ? 'Edit Class Details' : 'Create New Class'}</h2>
                 <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-100">
                   <X size={20} />
@@ -232,27 +232,27 @@ const Classes = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">Grade</label>
-                    <input required type="text" name="grade" value={formData.grade} onChange={handleInputChange} placeholder="e.g. 6" className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" />
+                    <input required type="text" name="grade" value={formData.grade} onChange={handleInputChange} placeholder="e.g. 6" className="block w-full rounded-xl border-gray-200 bg-white/30 focus:glass-card focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">Section</label>
-                    <input required type="text" name="section" value={formData.section} onChange={handleInputChange} placeholder="e.g. A" className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" />
+                    <input required type="text" name="section" value={formData.section} onChange={handleInputChange} placeholder="e.g. A" className="block w-full rounded-xl border-gray-200 bg-white/30 focus:glass-card focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Schedule / Period</label>
-                  <input type="text" name="period" value={formData.period || ''} onChange={handleInputChange} placeholder="e.g. Period 1 (09:00 AM)" className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" />
+                  <input type="text" name="period" value={formData.period || ''} onChange={handleInputChange} placeholder="e.g. Period 1 (09:00 AM)" className="block w-full rounded-xl border-gray-200 bg-white/30 focus:glass-card focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Assign Teacher (Optional)</label>
-                  <select name="teacherId" value={formData.teacherId} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all">
+                  <select name="teacherId" value={formData.teacherId} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-white/30 focus:glass-card focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all">
                     <option value="">-- Select a Teacher --</option>
                     {teachers.map(t => (
                       <option key={t._id} value={t._id}>{t.user.name} ({t.subject})</option>
                     ))}
                   </select>
                 </div>
-                <div className="mt-8 flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                <div className="mt-8 flex justify-end space-x-3 pt-4 border-t border-white/50">
                   <button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors">Cancel</button>
                   <button type="submit" className="px-5 py-2.5 rounded-xl text-sm font-medium text-white gradient-bg hover:shadow-lg hover:shadow-primary/30 transition-all hover-lift">
                     {currentClass ? 'Save Changes' : 'Create Class'}

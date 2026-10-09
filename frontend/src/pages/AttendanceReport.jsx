@@ -157,7 +157,7 @@ const AttendanceReport = () => {
         </div>
       )}
 
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex flex-col md:flex-row flex-wrap gap-4 items-end">
+      <div className="glass-card p-6 rounded-lg shadow-sm border border-white/50 flex flex-col md:flex-row flex-wrap gap-4 items-end">
         <div className="flex-1 min-w-[200px]">
           <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
           <select 
@@ -224,19 +224,19 @@ const AttendanceReport = () => {
 
       {records.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center">
+          <div className="glass-card p-4 rounded-lg shadow-sm border border-white/50 text-center">
             <p className="text-sm text-gray-500 font-medium">{selectedStudent ? 'Total Attendance Days' : 'Total Students (Records)'}</p>
             <p className="text-3xl font-bold text-gray-800 mt-1">{summary.total}</p>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center">
+          <div className="glass-card p-4 rounded-lg shadow-sm border border-white/50 text-center">
             <p className="text-sm text-gray-500 font-medium">{selectedStudent ? 'Days Present' : 'Present Students'}</p>
             <p className="text-3xl font-bold text-green-600 mt-1">{summary.present}</p>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center">
+          <div className="glass-card p-4 rounded-lg shadow-sm border border-white/50 text-center">
             <p className="text-sm text-gray-500 font-medium">{selectedStudent ? 'Days Absent' : 'Absent Students'}</p>
             <p className="text-3xl font-bold text-red-600 mt-1">{summary.absent}</p>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center">
+          <div className="glass-card p-4 rounded-lg shadow-sm border border-white/50 text-center">
             <p className="text-sm text-gray-500 font-medium">Attendance Percentage</p>
             <p className="text-3xl font-bold text-primary mt-1">{summary.percentage}%</p>
           </div>
@@ -244,7 +244,7 @@ const AttendanceReport = () => {
       )}
 
       {chartData.length > 1 && (
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-6">
+        <div className="glass-card p-6 rounded-lg shadow-sm border border-white/50 mb-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
             <BarChart2 size={20} className="mr-2 text-primary" /> 
             {selectedStudent ? 'Student Attendance Trend' : 'Class Attendance Trend'}
@@ -273,10 +273,10 @@ const AttendanceReport = () => {
       )}
 
       {records.length > 0 ? (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="glass-card rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto max-h-[600px]">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50 sticky top-0 z-10">
+              <thead className="bg-white/30 sticky top-0 z-10">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
@@ -285,12 +285,12 @@ const AttendanceReport = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Modified By</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="glass-card divide-y divide-gray-200">
                 {records.map(record => {
                   const className = classes.find(c => c._id === selectedClass);
                   const classStr = className ? `Grade ${className.grade}-${className.section}` : '';
                   return (
-                  <tr key={record._id} className="hover:bg-gray-50">
+                  <tr key={record._id} className="hover:bg-white/30">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {new Date(record.attendanceDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </td>
@@ -328,7 +328,7 @@ const AttendanceReport = () => {
         </div>
       ) : (
         selectedClass && !loading && (
-          <div className="bg-white p-10 rounded-lg shadow-sm border border-gray-100 text-center text-gray-500">
+          <div className="glass-card p-10 rounded-lg shadow-sm border border-white/50 text-center text-gray-500">
             No attendance records found for the selected filters.
           </div>
         )

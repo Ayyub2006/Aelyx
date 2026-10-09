@@ -81,12 +81,13 @@ const MainLayout = () => {
   );
 
   return (
-    <div className="flex h-screen bg-[#f4f7fe] overflow-hidden relative">
-      {/* Background ambient light */}
-      <div className="absolute top-0 left-[20%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+    <div className="flex h-screen overflow-hidden relative selection:bg-primary/20 selection:text-primary">
+      {/* Dynamic Background Elements */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] pointer-events-none mix-blend-multiply animate-pulse" style={{ animationDuration: '8s' }}></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/20 rounded-full blur-[120px] pointer-events-none mix-blend-multiply animate-pulse" style={{ animationDuration: '10s' }}></div>
 
       {/* Desktop Sidebar */}
-      <aside className="w-72 bg-white/80 backdrop-blur-xl border-r border-white shadow-[4px_0_24px_rgba(0,0,0,0.02)] hidden lg:flex flex-col z-20">
+      <aside className="w-72 glass-card border-r border-white/50 shadow-[4px_0_24px_rgba(0,0,0,0.02)] hidden lg:flex flex-col z-20 m-4 rounded-3xl overflow-hidden">
         <SidebarContent />
       </aside>
 
@@ -111,7 +112,7 @@ const MainLayout = () => {
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-            className="fixed inset-y-0 left-0 w-72 bg-white shadow-2xl flex flex-col z-50 lg:hidden"
+            className="fixed inset-y-0 left-0 w-72 glass-card shadow-2xl flex flex-col z-50 lg:hidden"
           >
             <SidebarContent />
           </motion.aside>
@@ -121,7 +122,7 @@ const MainLayout = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-full overflow-hidden relative z-10">
         {/* Mobile header */}
-        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 lg:hidden sticky top-0 z-30 shadow-sm">
+        <header className="h-16 glass-card border-b border-white/50 flex items-center justify-between px-4 lg:hidden sticky top-0 z-30 shadow-sm mx-4 mt-4 rounded-2xl">
           <div className="flex items-center">
             <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 -ml-2 mr-2 text-gray-600 hover:bg-gray-100 rounded-lg">
               <Menu size={24} />

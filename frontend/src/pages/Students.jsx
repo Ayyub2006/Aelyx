@@ -128,7 +128,7 @@ const Students = () => {
             <input
               type="text"
               placeholder="Search students..."
-              className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors shadow-sm"
+              className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl glass-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors shadow-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -140,7 +140,7 @@ const Students = () => {
               setFilterClassId(e.target.value);
               setPage(1);
             }}
-            className="block py-2.5 px-4 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors shadow-sm"
+            className="block py-2.5 px-4 border border-gray-200 rounded-xl glass-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors shadow-sm"
           >
             <option value="">All Classes</option>
             {Array.from(new Map(classes.map(c => [c.grade + '-' + c.section, c])).values()).map(c => (
@@ -159,10 +159,10 @@ const Students = () => {
         </div>
       </div>
 
-      <div className="glass-card rounded-2xl overflow-hidden bg-white/80 border border-gray-100">
+      <div className="glass-card rounded-2xl overflow-hidden  border border-white/50">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-100">
-            <thead className="bg-gray-50/50">
+            <thead className="bg-white/30/50">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Student Profile</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Roll Number</th>
@@ -180,7 +180,7 @@ const Students = () => {
                     <div className="flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>
                   </td></tr>
                 ) : filteredStudents.length === 0 ? (
-                  <tr><td colSpan="5" className="px-6 py-10 text-center text-gray-500 font-medium bg-gray-50/30">No students found matching your criteria.</td></tr>
+                  <tr><td colSpan="5" className="px-6 py-10 text-center text-gray-500 font-medium bg-white/30/30">No students found matching your criteria.</td></tr>
                 ) : (
                   filteredStudents.map((student, index) => (
                     <motion.tr 
@@ -229,7 +229,7 @@ const Students = () => {
         
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
+          <div className="px-6 py-4 border-t border-white/50 flex items-center justify-between bg-white/30/50">
             <div className="text-sm text-gray-500">
               Page <span className="font-medium text-gray-900">{page}</span> of <span className="font-medium text-gray-900">{totalPages}</span>
             </div>
@@ -237,14 +237,14 @@ const Students = () => {
               <button 
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 glass-card hover:bg-white/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Previous
               </button>
               <button 
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 glass-card hover:bg-white/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Next
               </button>
@@ -267,9 +267,9 @@ const Students = () => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white rounded-2xl max-w-md w-full shadow-2xl relative z-10 overflow-hidden border border-gray-100"
+              className="glass-card rounded-2xl max-w-md w-full shadow-2xl relative z-10 overflow-hidden border border-white/50"
             >
-              <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <div className="px-6 py-4 border-b border-white/50 flex justify-between items-center bg-white/30/50">
                 <h2 className="text-lg font-bold text-gray-900">{currentStudent ? 'Edit Student Profile' : 'Enroll New Student'}</h2>
                 <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-100">
                   <X size={20} />
@@ -278,27 +278,27 @@ const Students = () => {
               <form onSubmit={handleSubmit} autoComplete="off" className="p-6 space-y-5">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
-                  <input required type="text" name="name" value={formData.name} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" />
+                  <input required type="text" name="name" value={formData.name} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-white/30 focus:glass-card focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" />
                 </div>
                 {!currentStudent && (
                   <>
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Student Email (Optional)</label>
-                      <input type="email" name="email" autoComplete="off" value={formData.email || ''} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" placeholder="For student login" />
+                      <input type="email" name="email" autoComplete="off" value={formData.email || ''} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-white/30 focus:glass-card focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" placeholder="For student login" />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">Password (Optional)</label>
-                      <input type="password" name="password" autoComplete="new-password" value={formData.password || ''} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" placeholder="Required if email provided" />
+                      <input type="password" name="password" autoComplete="new-password" value={formData.password || ''} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-white/30 focus:glass-card focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" placeholder="Required if email provided" />
                     </div>
                   </>
                 )}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Roll Number</label>
-                  <input required disabled={!!currentStudent} type="text" name="rollNumber" value={formData.rollNumber} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all disabled:opacity-60" />
+                  <input required disabled={!!currentStudent} type="text" name="rollNumber" value={formData.rollNumber} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-white/30 focus:glass-card focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all disabled:opacity-60" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Assign Class</label>
-                  <select required name="classId" value={formData.classId} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all">
+                  <select required name="classId" value={formData.classId} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-white/30 focus:glass-card focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all">
                     <option value="">-- Select a Class --</option>
                     {Array.from(new Map(classes.map(c => [c.grade + '-' + c.section, c])).values()).map(c => (
                       <option key={c._id} value={c._id}>Grade {c.grade}-{c.section}</option>
@@ -307,10 +307,10 @@ const Students = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Guardian Contact</label>
-                  <input required type="text" name="guardianContact" value={formData.guardianContact} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" />
+                  <input required type="text" name="guardianContact" value={formData.guardianContact} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-white/30 focus:glass-card focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" />
                 </div>
                 
-                <div className="mt-8 flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                <div className="mt-8 flex justify-end space-x-3 pt-4 border-t border-white/50">
                   <button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors">Cancel</button>
                   <button type="submit" className="px-5 py-2.5 rounded-xl text-sm font-medium text-white gradient-bg hover:shadow-lg hover:shadow-primary/30 transition-all hover-lift">
                     {currentStudent ? 'Save Changes' : 'Enroll Student'}

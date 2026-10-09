@@ -159,7 +159,7 @@ const AttendanceMarking = () => {
         </div>
       )}
 
-      <div className="bg-white p-6 rounded-lg shadow flex flex-col md:flex-row gap-6 items-end">
+      <div className="glass-card p-6 rounded-lg shadow flex flex-col md:flex-row gap-6 items-end">
         <div className="flex-1 w-full">
           <label className="block text-sm font-medium text-gray-700 mb-1">Select Class</label>
           <select 
@@ -187,8 +187,8 @@ const AttendanceMarking = () => {
       </div>
 
       {selectedClass && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="p-4 border-b bg-gray-50 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="glass-card rounded-lg shadow overflow-hidden">
+          <div className="p-4 border-b bg-white/30 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="flex space-x-6 text-sm">
               <span className="font-semibold text-gray-700">Total: {students.length}</span>
               <span className="font-semibold text-green-600">Present: {presentCount}</span>
@@ -209,21 +209,21 @@ const AttendanceMarking = () => {
           {/* Desktop Table View */}
           <div className="hidden md:block overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-white">
+              <thead className="glass-card">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roll No</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="glass-card divide-y divide-gray-200">
                 {loading ? (
                   <tr><td colSpan="3" className="px-6 py-10 text-center text-gray-500">Loading records...</td></tr>
                 ) : students.length === 0 ? (
                   <tr><td colSpan="3" className="px-6 py-10 text-center text-gray-500">No students found in this class.</td></tr>
                 ) : (
                   students.map(student => (
-                    <tr key={student._id} className={clsx("transition-colors", attendance[student._id] === 'ABSENT' ? 'bg-red-50' : 'hover:bg-gray-50')}>
+                    <tr key={student._id} className={clsx("transition-colors", attendance[student._id] === 'ABSENT' ? 'bg-red-50' : 'hover:bg-white/30')}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {student.rollNumber}
                       </td>
@@ -240,8 +240,8 @@ const AttendanceMarking = () => {
                               "relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 text-sm font-medium",
                               attendance[student._id] === 'PRESENT' 
                                 ? "bg-green-500 text-white border-green-500 z-10" 
-                                : "bg-white text-gray-700",
-                              user?.role !== 'ADMIN' && attendance[student._id] !== 'PRESENT' ? "hover:bg-gray-50" : "",
+                                : "glass-card text-gray-700",
+                              user?.role !== 'ADMIN' && attendance[student._id] !== 'PRESENT' ? "hover:bg-white/30" : "",
                               user?.role === 'ADMIN' ? "cursor-not-allowed opacity-80" : ""
                             )}
                           >
@@ -255,8 +255,8 @@ const AttendanceMarking = () => {
                               "relative inline-flex items-center px-4 py-2 rounded-r-md border border-l-0 border-gray-300 text-sm font-medium",
                               attendance[student._id] === 'ABSENT' 
                                 ? "bg-red-500 text-white border-red-500 z-10" 
-                                : "bg-white text-gray-700",
-                              user?.role !== 'ADMIN' && attendance[student._id] !== 'ABSENT' ? "hover:bg-gray-50" : "",
+                                : "glass-card text-gray-700",
+                              user?.role !== 'ADMIN' && attendance[student._id] !== 'ABSENT' ? "hover:bg-white/30" : "",
                               user?.role === 'ADMIN' ? "cursor-not-allowed opacity-80" : ""
                             )}
                           >
@@ -272,7 +272,7 @@ const AttendanceMarking = () => {
           </div>
 
           {/* Mobile Card View */}
-          <div className="md:hidden flex flex-col space-y-3 p-4 bg-gray-50/50">
+          <div className="md:hidden flex flex-col space-y-3 p-4 bg-white/30/50">
             {loading ? (
               <div className="py-10 text-center text-gray-500">Loading records...</div>
             ) : students.length === 0 ? (
@@ -283,10 +283,10 @@ const AttendanceMarking = () => {
                   key={student._id} 
                   className={clsx(
                     "p-4 rounded-xl shadow-sm border transition-colors flex flex-col gap-3",
-                    attendance[student._id] === 'ABSENT' ? 'bg-red-50 border-red-100' : 'bg-white border-gray-200'
+                    attendance[student._id] === 'ABSENT' ? 'bg-red-50 border-red-100' : 'glass-card border-gray-200'
                   )}
                 >
-                  <div className="flex justify-between items-center border-b border-gray-100 pb-2">
+                  <div className="flex justify-between items-center border-b border-white/50 pb-2">
                     <span className="font-bold text-gray-900 text-lg">{student.name}</span>
                     <span className="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-md text-xs font-mono font-bold">Roll: {student.rollNumber}</span>
                   </div>
@@ -300,7 +300,7 @@ const AttendanceMarking = () => {
                         "flex-1 flex justify-center items-center py-2.5 rounded-l-lg border text-sm font-bold transition-colors",
                         attendance[student._id] === 'PRESENT' 
                           ? "bg-green-500 text-white border-green-500 z-10" 
-                          : "bg-white text-gray-700 border-gray-300",
+                          : "glass-card text-gray-700 border-gray-300",
                         user?.role === 'ADMIN' ? "cursor-not-allowed opacity-80" : ""
                       )}
                     >
@@ -314,7 +314,7 @@ const AttendanceMarking = () => {
                         "flex-1 flex justify-center items-center py-2.5 rounded-r-lg border border-l-0 text-sm font-bold transition-colors",
                         attendance[student._id] === 'ABSENT' 
                           ? "bg-red-500 text-white border-red-500 z-10" 
-                          : "bg-white text-gray-700 border-gray-300",
+                          : "glass-card text-gray-700 border-gray-300",
                         user?.role === 'ADMIN' ? "cursor-not-allowed opacity-80" : ""
                       )}
                     >
@@ -327,7 +327,7 @@ const AttendanceMarking = () => {
           </div>
 
           {user?.role !== 'ADMIN' && (
-            <div className="p-4 border-t bg-gray-50 flex justify-end">
+            <div className="p-4 border-t bg-white/30 flex justify-end">
               <button
                 onClick={handleSubmit}
                 disabled={students.length === 0 || loading}
