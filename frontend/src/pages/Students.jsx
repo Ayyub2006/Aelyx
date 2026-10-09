@@ -14,6 +14,11 @@ const Students = () => {
   const [currentStudent, setCurrentStudent] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [limit] = useState(10);
+  
   const [formData, setFormData] = useState({
     name: '',
     rollNumber: '',
@@ -25,16 +30,19 @@ const Students = () => {
 
   useEffect(() => {
     fetchData();
-  }, [filterClassId]);
+  }, [filterClassId, page]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const [studentRes, classRes] = await Promise.all([
-        getStudents(filterClassId),
+        getStudents(filterClassId, page, limit),
         getClasses()
       ]);
       setStudents(studentRes.data.students);
+      if (studentRes.data.pagination) {
+        setTotalPages(studentRes.data.pagination.totalPages);
+      }
       setClasses(classRes.data.classes);
     } catch (error) {
       console.error("Failed to fetch data", error);
@@ -128,7 +136,10 @@ const Students = () => {
 
           <select 
             value={filterClassId} 
-            onChange={(e) => setFilterClassId(e.target.value)}
+            onChange={(e) => {
+              setFilterClassId(e.target.value);
+              setPage(1);
+            }}
             className="block py-2.5 px-4 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors shadow-sm"
           >
             <option value="">All Classes</option>
@@ -215,6 +226,31 @@ const Students = () => {
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
+            <div className="text-sm text-gray-500">
+              Page <span className="font-medium text-gray-900">{page}</span> of <span className="font-medium text-gray-900">{totalPages}</span>
+            </div>
+            <div className="flex space-x-2">
+              <button 
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              <button 
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <AnimatePresence>

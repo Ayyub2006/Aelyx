@@ -1,7 +1,8 @@
 import api from './api';
 
-export const getStudents = async (classId) => {
-  const url = classId ? `/students?classId=${classId}` : '/students';
+export const getStudents = async (classId, page = 1, limit = 10) => {
+  let url = `/students?page=${page}&limit=${limit}`;
+  if (classId) url += `&classId=${classId}`;
   const { data } = await api.get(url);
   return data;
 };

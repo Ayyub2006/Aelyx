@@ -42,8 +42,25 @@ export const getStudents = async (req, res) => {
       }
     }
 
-    const students = await Student.find(query).populate('class', 'grade section').populate('user', 'email');
-    return successResponse(res, 200, 'Students retrieved successfully', { students });
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const startIndex = (page - 1) * limit;
+    const total = await Student.countDocuments(query);
+
+    const students = await Student.find(query)
+      .skip(startIndex)
+      .limit(limit)
+      .populate('class', 'grade section')
+      .populate('user', 'email');
+      
+    const pagination = {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    };
+
+    return successResponse(res, 200, 'Students retrieved successfully', { students, pagination });
   } catch (error) {
     console.error(error);
     return errorResponse(res, 500, 'Server Error');

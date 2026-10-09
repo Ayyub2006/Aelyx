@@ -8,8 +8,25 @@ import { successResponse, errorResponse } from '../utils/apiResponse.js';
 // @access  Private/Admin
 export const getTeachers = async (req, res) => {
   try {
-    const teachers = await Teacher.find().populate('user', 'name email role').populate('assignedClasses', 'grade section');
-    return successResponse(res, 200, 'Teachers retrieved successfully', { teachers });
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const startIndex = (page - 1) * limit;
+    const total = await Teacher.countDocuments();
+
+    const teachers = await Teacher.find()
+      .skip(startIndex)
+      .limit(limit)
+      .populate('user', 'name email role')
+      .populate('assignedClasses', 'grade section');
+
+    const pagination = {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    };
+
+    return successResponse(res, 200, 'Teachers retrieved successfully', { teachers, pagination });
   } catch (error) {
     console.error(error);
     return errorResponse(res, 500, 'Server Error');

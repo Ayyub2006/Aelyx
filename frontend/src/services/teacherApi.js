@@ -1,7 +1,7 @@
 import api from './api';
 
-export const getTeachers = async () => {
-  const { data } = await api.get('/teachers');
+export const getTeachers = async (page = 1, limit = 10) => {
+  const { data } = await api.get(`/teachers?page=${page}&limit=${limit}`);
   return data;
 };
 
