@@ -1,105 +1,106 @@
-# Mini School ERP — Attendance Management System
+# Aelyx - Premium Mini School ERP
 
-A production-quality, responsive, and visually polished Mini School ERP application focused heavily on Attendance Management. Built with the MERN stack (MongoDB, Express, React, Node.js) and Tailwind CSS.
+## Project Overview
+Aelyx is a comprehensive, visually stunning, and highly responsive Mini School Enterprise Resource Planning (ERP) system. Designed with a premium **Glassmorphism UI** and fluid animations, it seamlessly connects Admins, Teachers, and Students. The system provides powerful tools to manage classes, teacher assignments, student directories, and daily attendance tracking, complete with visual analytics and report generation.
 
-## 🚀 Features
+## Tech Stack & Reasoning
+- **Frontend**: React (Vite), TailwindCSS, Framer Motion, Recharts, Axios, React Router.
+  - *Reasoning*: React allows for a highly modular, component-driven architecture. TailwindCSS enabled the rapid creation of the complex, premium "frosted glass" aesthetic. Framer Motion was utilized to ensure every page transition and UI interaction feels smooth, dynamic, and high-end. Recharts provides robust and beautiful data visualization for attendance trends.
+- **Backend**: Node.js, Express.js, MongoDB (Mongoose), JWT, bcryptjs.
+  - *Reasoning*: Node.js and Express provide a lightweight, asynchronous, and high-performance API layer. MongoDB's NoSQL document structure is perfectly suited for managing flexible relationships between users, classes, and nested daily attendance records without complex joins.
 
-- **Secure Authentication:** JWT-based authentication with bcrypt password hashing.
-- **Role-Based Access Control:** Distinct roles for `ADMIN` and `TEACHER` with strictly enforced backend authorization.
-- **Teacher & Student Management:** Full CRUD capabilities for administrators to manage school personnel and students.
-- **Class Management:** Create classes and assign them to specific teachers.
-- **Advanced Attendance Marking:** 
-  - Intuitive interface for teachers to mark daily attendance.
-  - Automatic duplicate prevention using MongoDB compound unique indexes.
-  - Seamless "Edit Mode" integration for updating past attendance records.
-- **Attendance Reporting & Analytics:**
-  - Date-range filtering and class-specific reporting.
-  - Real-time dashboard widgets showing total present, absent, and attendance percentages.
-  - **Export to CSV** functionality for easy external record keeping.
-- **Admin Dashboard:** A high-level overview of total students, classes, teachers, and today's attendance rate.
-
-## 💻 Technology Stack
-
-**Frontend:**
-- React (Vite)
-- React Router DOM (Protected & Role-based routing)
-- Tailwind CSS v4 (Styling)
-- Lucide React (Beautiful icons)
-- Axios (API Client)
-
-**Backend:**
-- Node.js & Express.js
-- MongoDB & Mongoose
-- JSON Web Tokens (JWT) & bcryptjs
-- CORS & dotenv
-
-## 🛠️ Installation & Local Setup
-
-### 1. Prerequisites
+## Prerequisites
 Ensure you have the following installed on your machine:
-- Node.js (v16+)
-- MongoDB (running locally on `mongodb://localhost:27017` or via MongoDB Atlas)
+- Node.js (v18 or higher)
+- MongoDB (Running locally on port 27017, or a MongoDB Atlas URI)
+- Git
 
-### 2. Clone the Repository
-```bash
-git clone <your-repo-url>
-cd mini-school-erp
-```
+## Setup Instructions & Environment Variables
 
-### 3. Backend Setup
-```bash
-cd backend
+### 1. Backend Setup
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create a `.env` file in the `backend/` directory:
+   ```env
+   PORT=5000
+   MONGO_URI=mongodb://localhost:27017/mini-school-erp
+   JWT_SECRET=your_super_secret_jwt_key_here
+   NODE_ENV=development
+   ```
 
-# Install dependencies
-npm install
+### 2. Frontend Setup
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create a `.env` file in the `frontend/` directory (optional, defaults to localhost:5000):
+   ```env
+   VITE_API_URL=http://localhost:5000/api
+   ```
 
-# Create a .env file based on the provided .env.example (or manually create one)
-echo "PORT=5000" > .env
-echo "MONGO_URI=mongodb://localhost:27017/mini-school-erp" >> .env
-echo "JWT_SECRET=your_super_secret_jwt_key_123" >> .env
-echo "NODE_ENV=development" >> .env
+## Database Setup & Test Credentials
+The database (MongoDB) will automatically be created when the server connects and performs its first write operation. 
 
-# Start the backend development server
-npm run dev
-```
+**Test Credentials:**
+If you have run the application, you can register an Admin via Postman, or use the following provided test credentials (if you have already seeded/created them in your local database):
+- **Admin**: `admin@school.com` (Password: `password123`)
+- **Teacher**: `teacher@school.com` (Password: `password123`)
+- **Student**: `student@school.com` (Password: `password123`)
 
-### 4. Frontend Setup
-Open a new terminal window:
-```bash
-cd frontend
+## How to Run Locally
+You can get the entire project running locally in under 5 minutes.
 
-# Install dependencies
-npm install
+1. **Start the Backend server:**
+   ```bash
+   cd backend
+   npm run dev
+   ```
+   *(Server should start on http://localhost:5000)*
 
-# Start the frontend development server
-npm run dev
-```
+2. **Start the Frontend development server:**
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+   *(App should be accessible at http://localhost:5173)*
 
-### 5. Access the Application
-- Open your browser and navigate to `http://localhost:5173`
-- The backend API runs on `http://localhost:5000`
+## API Endpoint Overview
+The RESTful API is secured via JWT Bearer Tokens.
+- **Auth**: `POST /api/auth/login`, `POST /api/auth/register`, `GET /api/auth/me`
+- **Dashboard**: `GET /api/dashboard/summary` (Role-based response)
+- **Classes**: `GET /api/classes`, `POST /api/classes`, `PUT /api/classes/:id`, `DELETE /api/classes/:id`
+- **Students**: `GET /api/students`, `POST /api/students`, `PUT /api/students/:id`, `DELETE /api/students/:id`
+- **Teachers**: `GET /api/teachers`, `POST /api/teachers`, `PUT /api/teachers/:id`, `DELETE /api/teachers/:id`
+- **Attendance**: 
+  - `GET /api/attendance/:classId/:date`
+  - `POST /api/attendance`
+  - `PUT /api/attendance/class/:classId`
+  - `GET /api/attendance/report`
 
-## 🧪 Testing the Application (User Guide)
+## What Was Completed
+- **Role-Based Access Control (RBAC)**: Distinct dashboards and permissions for Admins, Teachers, and Students.
+- **Premium UI Overhaul**: Implemented a stunning glassmorphism design system with animated mesh gradients and Framer Motion page transitions.
+- **Core ERP Modules**: Full CRUD functionality for Classes, Teachers, and Students.
+- **Attendance Engine**: Interactive daily attendance marking, historic editing, and CSV exports.
+- **Visual Analytics**: Interactive `Recharts` SVG radial progress bars and area charts for attendance trends.
+- **Security**: Password hashing, JWT-based auth, and UI auto-complete prevention for browser password managers on non-login forms.
 
-1. **Initial Setup (Admin):**
-   - The application does not come with pre-seeded users for security reasons. 
-   - You can quickly register your first Admin by sending a `POST` request to `http://localhost:5000/api/auth/register` (using Postman or cURL) with `{ "name": "Admin", "email": "admin@school.com", "password": "password123", "role": "ADMIN" }`.
-2. **Login:** Log in to the frontend using your newly created Admin credentials.
-3. **Setup Data:** 
-   - Navigate to **Teachers** and add a teacher.
-   - Navigate to **Classes** and create a class, assigning the new teacher to it.
-   - Navigate to **Students** and add a few students, linking them to the class.
-4. **Mark Attendance:** 
-   - Navigate to **Attendance**. Select the class and today's date. Mark the students and hit Save.
-   - Try marking it again to see the duplicate protection kick in.
-   - Edit the attendance by selecting the same date and making changes.
-5. **View Reports:** Navigate to **Reports**, generate a report for the current month, and export the data to CSV!
+## What Was Skipped
+- **Dedicated Parent Portal**: A separate UI for parents was bypassed; instead, students and parents can use the "Student" role to view their read-only attendance stats.
+- **Advanced Server-Side Pagination**: Implemented client-side filtering and search across tables rather than complex server-side cursor pagination to prioritize rapid feature delivery.
 
-## 🛡️ Security Measures
-- Passwords are never stored in plain text.
-- Authorization is always enforced on the backend (e.g., a teacher cannot mark attendance for a class they are not assigned to).
-- The frontend Axios instance utilizes interceptors to securely attach JWT tokens to all outgoing requests.
-- Protected Routes in React prevent unauthorized viewing of internal pages.
-
----
-*Built as a technical assessment demonstration.*
+## What Would Be Improved With More Time
+- **Pagination & Infinite Scroll**: For schools with 10,000+ students, server-side pagination would be implemented on the API and data tables.
+- **Automated Notifications**: Integration with Nodemailer or Twilio to automatically email/SMS parents when a student is marked absent.
+- **PDF Export**: Expand the current CSV export functionality to generate beautiful PDF report cards.
+- **Dark Mode Toggle**: The UI is currently built on a dark/premium gradient theme; adding a stark light-mode toggle would improve accessibility.
