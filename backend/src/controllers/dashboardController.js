@@ -4,6 +4,38 @@ import Class from '../models/Class.js';
 import Attendance from '../models/Attendance.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
 
+const generateTrendData = (records, startDate) => {
+  const trend = [];
+  const currentDate = new Date(startDate);
+  
+  for (let i = 0; i < 7; i++) {
+    const dateStr = currentDate.toISOString().split('T')[0];
+    // Create short day name e.g. "Mon"
+    const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'short' });
+    
+    // Find records matching exactly this date
+    const dayRecords = records.filter(r => {
+      const rDate = new Date(r.attendanceDate);
+      return rDate.toISOString().split('T')[0] === dateStr;
+    });
+
+    const present = dayRecords.filter(r => r.status === 'PRESENT').length;
+    const absent = dayRecords.filter(r => r.status === 'ABSENT').length;
+    
+    trend.push({
+      date: dateStr,
+      day: dayName,
+      present,
+      absent
+    });
+
+    // Move to next day
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  
+  return trend;
+};
+
 // @desc    Get dashboard summary statistics
 // @route   GET /api/dashboard/summary
 // @access  Private (Teacher/Admin)
@@ -20,6 +52,10 @@ export const getDashboardSummary = async (req, res) => {
       todayAbsent: 0,
     };
 
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); // Includes today, so 7 days total
+
     if (req.user.role === 'ADMIN') {
       // Admin sees system-wide stats
       summary.totalTeachers = await Teacher.countDocuments();
@@ -29,6 +65,13 @@ export const getDashboardSummary = async (req, res) => {
       const todayAttendance = await Attendance.find({ attendanceDate: today });
       summary.todayPresent = todayAttendance.filter(a => a.status === 'PRESENT').length;
       summary.todayAbsent = todayAttendance.filter(a => a.status === 'ABSENT').length;
+
+      // 7 Day Trend
+      const trendRecords = await Attendance.find({ 
+        attendanceDate: { $gte: sevenDaysAgo, $lte: today } 
+      });
+      summary.trend = generateTrendData(trendRecords, sevenDaysAgo);
+
     } else if (req.user.role === 'TEACHER') {
       // Teacher sees stats specific to their classes
       const teacher = await Teacher.findOne({ user: req.user._id });
@@ -45,6 +88,13 @@ export const getDashboardSummary = async (req, res) => {
         });
         summary.todayPresent = todayAttendance.filter(a => a.status === 'PRESENT').length;
         summary.todayAbsent = todayAttendance.filter(a => a.status === 'ABSENT').length;
+
+        // 7 Day Trend
+        const trendRecords = await Attendance.find({ 
+          class: { $in: myClassIds },
+          attendanceDate: { $gte: sevenDaysAgo, $lte: today } 
+        });
+        summary.trend = generateTrendData(trendRecords, sevenDaysAgo);
       }
     }
 
