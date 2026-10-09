@@ -16,11 +16,16 @@ const AttendanceMarking = () => {
   const [loading, setLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
+  const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+
   useEffect(() => {
     fetchClasses();
   }, []);
 
   useEffect(() => {
+    setErrorMsg('');
+    setSuccessMsg('');
     if (selectedClass && date) {
       loadData(selectedClass, date);
     } else {
@@ -40,7 +45,7 @@ const AttendanceMarking = () => {
         setClasses(res.data.classes);
       }
     } catch (error) {
-      console.error("Failed to fetch classes");
+      setErrorMsg("Failed to fetch classes");
     }
   };
 
@@ -82,7 +87,7 @@ const AttendanceMarking = () => {
         setAttendance(initialAttendance);
       }
     } catch (error) {
-      console.error("Failed to load data");
+      setErrorMsg("Failed to load attendance data");
     } finally {
       setLoading(false);
     }
@@ -101,7 +106,12 @@ const AttendanceMarking = () => {
   };
 
   const handleSubmit = async () => {
-    if (!selectedClass || !date) return alert('Please select a class and date');
+    setErrorMsg('');
+    setSuccessMsg('');
+    if (!selectedClass || !date) {
+      setErrorMsg('Please select a class and date');
+      return;
+    }
     
     const records = Object.keys(attendance).map(studentId => ({
       studentId,
@@ -111,14 +121,15 @@ const AttendanceMarking = () => {
     try {
       if (isEditMode) {
         await updateClassAttendance(selectedClass, { date, records });
-        alert('Attendance updated successfully');
+        setSuccessMsg('Attendance updated successfully');
       } else {
         await markAttendance({ classId: selectedClass, date, records });
-        alert('Attendance saved successfully');
+        setSuccessMsg('Attendance saved successfully');
         setIsEditMode(true); // Automatically switch to edit mode after saving
       }
+      setTimeout(() => setSuccessMsg(''), 3000);
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to save attendance');
+      setErrorMsg(error.response?.data?.message || 'Failed to save attendance');
     }
   };
 
@@ -135,6 +146,18 @@ const AttendanceMarking = () => {
           </span>
         )}
       </div>
+
+      {errorMsg && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md shadow-sm">
+          <p className="text-sm text-red-700">{errorMsg}</p>
+        </div>
+      )}
+
+      {successMsg && (
+        <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-md shadow-sm">
+          <p className="text-sm text-green-700">{successMsg}</p>
+        </div>
+      )}
 
       <div className="bg-white p-6 rounded-lg shadow flex flex-col md:flex-row gap-6 items-end">
         <div className="flex-1 w-full">

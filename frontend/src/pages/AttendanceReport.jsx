@@ -20,6 +20,7 @@ const AttendanceReport = () => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState({ total: 0, present: 0, absent: 0, percentage: 0 });
+  const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
     fetchClasses();
@@ -39,7 +40,7 @@ const AttendanceReport = () => {
       const res = await getClasses();
       setClasses(res.data.classes);
     } catch (error) {
-      console.error("Failed to fetch classes");
+      setErrorMsg("Failed to fetch classes");
     }
   };
 
@@ -48,13 +49,20 @@ const AttendanceReport = () => {
       const res = await getStudents(classId);
       setStudents(res.data.students);
     } catch (error) {
-      console.error("Failed to fetch students");
+      setErrorMsg("Failed to fetch students");
     }
   };
 
   const handleGenerateReport = async () => {
-    if (!selectedClass || !startDate || !endDate) return alert('Please fill Class, Start Date, and End Date');
-    if (new Date(startDate) > new Date(endDate)) return alert('Start date must be before end date');
+    setErrorMsg('');
+    if (!selectedClass || !startDate || !endDate) {
+      setErrorMsg('Please fill Class, Start Date, and End Date');
+      return;
+    }
+    if (new Date(startDate) > new Date(endDate)) {
+      setErrorMsg('Start date must be before end date');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -62,7 +70,7 @@ const AttendanceReport = () => {
       setRecords(res.data.records);
       setSummary(res.data.summary);
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to generate report');
+      setErrorMsg(error.response?.data?.message || 'Failed to generate report');
     } finally {
       setLoading(false);
     }
@@ -100,6 +108,12 @@ const AttendanceReport = () => {
           </button>
         )}
       </div>
+
+      {errorMsg && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md shadow-sm">
+          <p className="text-sm text-red-700">{errorMsg}</p>
+        </div>
+      )}
 
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex flex-col md:flex-row flex-wrap gap-4 items-end">
         <div className="flex-1 min-w-[200px]">
