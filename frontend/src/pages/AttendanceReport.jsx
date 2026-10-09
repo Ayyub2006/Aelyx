@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { getClasses } from '../services/classApi';
 import { getStudents, getMyProfile } from '../services/studentApi';
 import { getAttendanceReport } from '../services/attendanceApi';
-import { Download, FileText } from 'lucide-react';
+import { Download, FileText, BarChart2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import clsx from 'clsx';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const AttendanceReport = () => {
   const { user } = useAuth();
@@ -20,6 +21,7 @@ const AttendanceReport = () => {
   const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
   
   const [records, setRecords] = useState([]);
+  const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState({ total: 0, present: 0, absent: 0, percentage: 0 });
   const [errorMsg, setErrorMsg] = useState('');
@@ -89,6 +91,26 @@ const AttendanceReport = () => {
       const res = await getAttendanceReport(selectedClass, startDate, endDate, selectedStudent);
       setRecords(res.data.records);
       setSummary(res.data.summary);
+      
+      // Generate Chart Data
+      const grouped = {};
+      res.data.records.forEach(r => {
+        const dateStr = new Date(r.attendanceDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+        if (!grouped[dateStr]) {
+          grouped[dateStr] = { date: dateStr, present: 0, absent: 0, total: 0 };
+        }
+        grouped[dateStr].total += 1;
+        if (r.status === 'PRESENT') grouped[dateStr].present += 1;
+        else grouped[dateStr].absent += 1;
+      });
+
+      const processedChartData = Object.values(grouped).map(d => ({
+        ...d,
+        rate: Math.round((d.present / d.total) * 100)
+      })).reverse(); // Reverse for chronological order (assuming API returns latest first)
+      
+      setChartData(processedChartData);
+      
     } catch (error) {
       setErrorMsg(error.response?.data?.message || 'Failed to generate report');
     } finally {
@@ -217,6 +239,35 @@ const AttendanceReport = () => {
           <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center">
             <p className="text-sm text-gray-500 font-medium">Attendance Percentage</p>
             <p className="text-3xl font-bold text-primary mt-1">{summary.percentage}%</p>
+          </div>
+        </div>
+      )}
+
+      {chartData.length > 1 && (
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+            <BarChart2 size={20} className="mr-2 text-primary" /> 
+            {selectedStudent ? 'Student Attendance Trend' : 'Class Attendance Trend'}
+          </h2>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorRate" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} domain={[0, 100]} dx={-10} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  formatter={(value) => [`${value}%`, 'Attendance Rate']}
+                />
+                <Area type="monotone" dataKey="rate" stroke="#4f46e5" strokeWidth={3} fillOpacity={1} fill="url(#colorRate)" />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
       )}
