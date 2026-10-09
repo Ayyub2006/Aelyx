@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
 import { getClasses } from '../services/classApi';
 import { getStudents, getMyProfile } from '../services/studentApi';
@@ -142,10 +143,24 @@ const AttendanceReport = () => {
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">View Attendance Reports</h1>
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        className="glass-card p-6 md:p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden mb-8 border border-white/60"
+      >
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+        <div className="relative z-10 flex flex-col w-full md:flex-row justify-between md:items-center">
+        <div className="relative z-10 mb-4 md:mb-0">
+          <h1 className="text-3xl font-extrabold text-gray-900 flex items-center tracking-tight">
+            <span className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white flex items-center justify-center mr-4 shadow-lg shadow-emerald-500/30 transform -rotate-3 hover:rotate-0 transition-transform duration-300">
+              <FileText size={28} />
+            </span>
+            Attendance Reports
+          </h1>
+          <p className="text-gray-500 text-base mt-2 font-medium ml-[4.5rem]">Generate analytics and view historical attendance.</p>
+        </div>
         {records.length > 0 && (
-          <button onClick={exportCSV} className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors shadow-sm">
+          <button onClick={exportCSV} className="flex items-center px-6 py-3 bg-gradient-to-br from-emerald-500 to-green-600 text-white rounded-2xl hover:shadow-lg hover:shadow-emerald-500/30 hover-lift font-bold tracking-wide transition-all z-10">
             <Download size={18} className="mr-2" /> Export CSV
           </button>
         )}
@@ -220,7 +235,8 @@ const AttendanceReport = () => {
           <FileText size={18} className="mr-2" /> 
           {loading ? 'Loading...' : 'Generate'}
         </button>
-      </div>
+        </div>
+      </motion.div>
 
       {records.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

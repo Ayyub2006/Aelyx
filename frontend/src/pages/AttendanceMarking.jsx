@@ -3,7 +3,8 @@ import { getClasses } from '../services/classApi';
 import { getStudents } from '../services/studentApi';
 import { markAttendance, getClassAttendanceByDate, updateClassAttendance } from '../services/attendanceApi';
 import { useAuth } from '../context/AuthContext';
-import { Check, X, Save, Edit3 } from 'lucide-react';
+import { Check, X, Save, Edit3, CheckSquare } from 'lucide-react';
+import { motion } from 'framer-motion';
 import clsx from 'clsx';
 
 const AttendanceMarking = () => {
@@ -138,14 +139,30 @@ const AttendanceMarking = () => {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Attendance Dashboard</h1>
-        {isEditMode && (
-          <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium flex items-center">
-            <Edit3 size={16} className="mr-1" /> Edit Mode Active
-          </span>
-        )}
-      </div>
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        className="glass-card p-6 md:p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden mb-8 border border-white/60"
+      >
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl -ml-10 -mb-10 pointer-events-none"></div>
+        <div className="relative z-10 flex flex-col w-full md:flex-row justify-between md:items-center">
+          <div className="relative z-10 mb-4 md:mb-0">
+            <h1 className="text-3xl font-extrabold text-gray-900 flex items-center tracking-tight">
+              <span className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center mr-4 shadow-lg shadow-amber-500/30 transform -rotate-3 hover:rotate-0 transition-transform duration-300">
+                <CheckSquare size={28} />
+              </span>
+              Attendance Marking
+            </h1>
+            <p className="text-gray-500 text-base mt-2 font-medium ml-[4.5rem]">Mark or update daily attendance for your classes.</p>
+          </div>
+          {isEditMode && (
+            <span className="px-4 py-2 bg-amber-100 text-amber-800 rounded-2xl text-sm font-bold flex items-center shadow-inner">
+              <Edit3 size={18} className="mr-2" /> Edit Mode Active
+            </span>
+          )}
+        </div>
+      </motion.div>
 
       {errorMsg && (
         <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md shadow-sm">

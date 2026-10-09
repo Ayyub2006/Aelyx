@@ -109,15 +109,21 @@ const Students = () => {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-            <span className="w-8 h-8 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center mr-3">
-              <Users size={20} />
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        className="glass-card p-6 md:p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 relative overflow-hidden mb-8 border border-white/60"
+      >
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-indigo-500/10 rounded-full blur-2xl -ml-10 -mb-10 pointer-events-none"></div>
+        <div className="relative z-10">
+          <h1 className="text-3xl font-extrabold text-gray-900 flex items-center tracking-tight">
+            <span className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center mr-4 shadow-lg shadow-indigo-500/30 transform -rotate-3 hover:rotate-0 transition-transform duration-300">
+              <Users size={28} />
             </span>
             Student Directory
           </h1>
-          <p className="text-gray-500 text-sm mt-1">Manage student records and class enrollments.</p>
+          <p className="text-gray-500 text-base mt-2 font-medium ml-[4.5rem]">Manage student records and class enrollments.</p>
         </div>
         
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
@@ -151,25 +157,25 @@ const Students = () => {
           {user?.role === 'ADMIN' && (
             <button
               onClick={openAddModal}
-              className="flex items-center px-4 py-2.5 bg-primary text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-sm hover-lift whitespace-nowrap text-sm font-medium"
+              className="flex items-center px-6 py-3 gradient-bg text-white rounded-2xl shadow-lg shadow-indigo-500/30 hover-lift whitespace-nowrap text-sm font-bold tracking-wide transition-all"
             >
               <Plus size={18} className="mr-2" /> Add Student
             </button>
           )}
         </div>
-      </div>
+      </motion.div>
 
       <div className="glass-card rounded-2xl overflow-hidden  border border-white/50">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-100">
-            <thead className="bg-white/30/50">
+            <thead className="bg-white/40 backdrop-blur-md border-b border-white/50">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Student Profile</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Roll Number</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Class</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Guardian Contact</th>
+                <th className="px-6 py-5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Student Profile</th>
+                <th className="px-6 py-5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Roll Number</th>
+                <th className="px-6 py-5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Class</th>
+                <th className="px-6 py-5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Guardian Contact</th>
                 {user?.role === 'ADMIN' && (
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-5 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                 )}
               </tr>
             </thead>
