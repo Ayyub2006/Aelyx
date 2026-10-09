@@ -248,7 +248,7 @@ const Teachers = () => {
                   <X size={20} />
                 </button>
               </div>
-              <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              <form onSubmit={handleSubmit} autoComplete="off" className="p-6 space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
@@ -256,14 +256,14 @@ const Teachers = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
-                    <input required disabled={!!currentTeacher} type="email" name="email" value={formData.email} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all disabled:opacity-60" />
+                    <input required disabled={!!currentTeacher} type="email" name="email" autoComplete="off" value={formData.email} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all disabled:opacity-60" />
                   </div>
                 </div>
                 
                 {!currentTeacher && (
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">Account Password</label>
-                    <input required type="password" name="password" value={formData.password} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" />
+                    <input required type="password" name="password" autoComplete="new-password" value={formData.password} onChange={handleInputChange} className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm p-3 border transition-all" />
                   </div>
                 )}
                 

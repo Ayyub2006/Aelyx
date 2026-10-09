@@ -126,7 +126,7 @@ const AttendanceReport = () => {
       const dateStr = new Date(r.attendanceDate).toLocaleDateString();
       const className = classes.find(c => c._id === selectedClass);
       const classStr = className ? `Grade ${className.grade}-${className.section}` : '';
-      return `${dateStr},"${r.student.name}",${classStr},${r.status}`;
+      return `${dateStr},"${r.student?.name || 'Unknown Student'}",${classStr},${r.status}`;
     });
     
     const csvContent = headers.concat(csvData).join('\n');
@@ -295,7 +295,7 @@ const AttendanceReport = () => {
                       {new Date(record.attendanceDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {record.student.name}
+                      {record.student?.name || <span className="text-gray-400 italic">Deleted Student</span>}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {classStr}
