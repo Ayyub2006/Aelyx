@@ -172,19 +172,19 @@ const AttendanceReport = () => {
       {records.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center">
-            <p className="text-sm text-gray-500 font-medium">Total Records</p>
+            <p className="text-sm text-gray-500 font-medium">{selectedStudent ? 'Total Attendance Days' : 'Total Students (Records)'}</p>
             <p className="text-3xl font-bold text-gray-800 mt-1">{summary.total}</p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center">
-            <p className="text-sm text-gray-500 font-medium">Present</p>
+            <p className="text-sm text-gray-500 font-medium">{selectedStudent ? 'Days Present' : 'Present Students'}</p>
             <p className="text-3xl font-bold text-green-600 mt-1">{summary.present}</p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center">
-            <p className="text-sm text-gray-500 font-medium">Absent</p>
+            <p className="text-sm text-gray-500 font-medium">{selectedStudent ? 'Days Absent' : 'Absent Students'}</p>
             <p className="text-3xl font-bold text-red-600 mt-1">{summary.absent}</p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center">
-            <p className="text-sm text-gray-500 font-medium">Attendance %</p>
+            <p className="text-sm text-gray-500 font-medium">Attendance Percentage</p>
             <p className="text-3xl font-bold text-primary mt-1">{summary.percentage}%</p>
           </div>
         </div>
