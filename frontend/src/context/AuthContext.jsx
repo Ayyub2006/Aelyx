@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) {
         setLoading(false);
         return;
@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
         setUser(data.data.user);
       } catch (error) {
         console.error('Error fetching user', error);
-        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
       } finally {
         setLoading(false);
       }
@@ -33,13 +33,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
-    localStorage.setItem('token', data.data.token);
+    sessionStorage.setItem('token', data.data.token);
     setUser(data.data.user);
     return data;
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     setUser(null);
   };
 
